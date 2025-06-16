@@ -1,0 +1,376 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Cryptonest - Crypto Airdrop Trading</title>
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <script src="https://cdn.jsdelivr.net/npm/web3@1.5.2/dist/web3.min.js"></script>
+    <style>
+        :root {
+            --primary-color: #28a745;
+            --primary-dark: #1e7e34;
+            --text-color: #333;
+            --light-gray: #f8f9fa;
+            --white: #ffffff;
+            --error-color: #dc3545;
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Poppins', sans-serif;
+        }
+
+        body {
+            background-color: var(--light-gray);
+            color: var(--text-color);
+            line-height: 1.6;
+        }
+
+        #app {
+            max-width: 600px;
+            margin: 0 auto;
+            padding: 20px;
+            min-height: 100vh;
+            position: relative;
+        }
+
+        .screen {
+            display: none;
+            flex-direction: column;
+            align-items: center;
+            padding: 20px;
+            animation: fadeIn 0.5s ease;
+        }
+
+        .screen.active {
+            display: flex;
+        }
+
+        header {
+            text-align: center;
+            margin-bottom: 30px;
+        }
+
+        header h1 {
+            color: var(--primary-color);
+            font-size: 2rem;
+            margin-bottom: 10px;
+        }
+
+        header p {
+            color: #666;
+            font-size: 1rem;
+        }
+
+        .logo {
+            margin: 30px 0;
+        }
+
+        .logo img {
+            width: 150px;
+            height: 150px;
+            border-radius: 50%;
+            object-fit: cover;
+            border: 3px solid var(--primary-color);
+        }
+
+        .cta-btn {
+            background-color: var(--primary-color);
+            color: var(--white);
+            border: none;
+            padding: 15px 30px;
+            font-size: 1.1rem;
+            border-radius: 50px;
+            cursor: pointer;
+            font-weight: 600;
+            transition: all 0.3s ease;
+            margin-top: 20px;
+            width: 100%;
+            max-width: 300px;
+        }
+
+        .cta-btn:hover {
+            background-color: var(--primary-dark);
+            transform: translateY(-2px);
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.1);
+        }
+
+        .balance-card {
+            background-color: var(--white);
+            border-radius: 15px;
+            padding: 20px;
+            width: 100%;
+            max-width: 400px;
+            text-align: center;
+            margin-bottom: 30px;
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.05);
+        }
+
+        .balance-card h3 {
+            color: #666;
+            font-size: 1rem;
+            margin-bottom: 10px;
+        }
+
+        .balance-card h2 {
+            color: var(--primary-color);
+            font-size: 2.5rem;
+            font-weight: 700;
+        }
+
+        .action-buttons {
+            display: flex;
+            flex-direction: column;
+            gap: 15px;
+            width: 100%;
+            max-width: 400px;
+        }
+
+        .action-btn {
+            padding: 15px;
+            border-radius: 10px;
+            border: none;
+            font-size: 1rem;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            width: 100%;
+        }
+
+        .action-btn:not(.inactive) {
+            background-color: var(--primary-color);
+            color: var(--white);
+        }
+
+        .action-btn:not(.inactive):hover {
+            background-color: var(--primary-dark);
+            transform: translateY(-2px);
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.1);
+        }
+
+        .action-btn.inactive {
+            background-color: #ccc;
+            color: #666;
+            cursor: not-allowed;
+        }
+
+        .error-msg {
+            color: var(--error-color);
+            text-align: center;
+            margin-top: 20px;
+            font-weight: 500;
+            display: none;
+        }
+
+        .payment-slip {
+            background-color: var(--white);
+            padding: 20px;
+            border-radius: 15px;
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.05);
+            text-align: center;
+            margin-bottom: 30px;
+            width: 100%;
+            max-width: 400px;
+        }
+
+        .payment-slip img {
+            width: 100%;
+            border-radius: 10px;
+            margin-bottom: 20px;
+        }
+
+        .payment-slip p {
+            color: #666;
+        }
+
+        /* Loading Spinner */
+        .spinner {
+            width: 50px;
+            height: 50px;
+            border: 5px solid rgba(40, 167, 69, 0.2);
+            border-radius: 50%;
+            border-top-color: var(--primary-color);
+            animation: spin 1s ease-in-out infinite;
+            margin-bottom: 20px;
+        }
+
+        #loading-screen p {
+            color: var(--primary-color);
+            font-weight: 600;
+        }
+
+        @keyframes spin {
+            to { transform: rotate(360deg); }
+        }
+
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(20px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        /* Responsive adjustments */
+        @media (max-width: 480px) {
+            header h1 {
+                font-size: 1.5rem;
+            }
+            
+            .balance-card h2 {
+                font-size: 2rem;
+            }
+            
+            .cta-btn, .action-btn {
+                padding: 12px;
+                font-size: 0.9rem;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div id="app">
+        <!-- Home Screen -->
+        <div id="home-screen" class="screen active">
+            <header>
+                <h1>Cryptonest</h1>
+                <p>Your gateway to crypto airdrop trading</p>
+            </header>
+            <div class="logo">
+                <img src="https://via.placeholder.com/150" alt="Cryptonest Logo">
+            </div>
+            <button id="create-account-btn" class="cta-btn">Create My Trading Account</button>
+        </div>
+
+        <!-- Loading Screen -->
+        <div id="loading-screen" class="screen">
+            <div class="spinner"></div>
+            <p>Connecting to your wallet...</p>
+        </div>
+
+        <!-- Dashboard Screen -->
+        <div id="dashboard-screen" class="screen">
+            <header>
+                <h1>Welcome, <span id="user-name">User</span></h1>
+                <p>Your trading dashboard</p>
+            </header>
+            
+            <div class="balance-card">
+                <h3>Trading Account Balance</h3>
+                <h2 id="account-balance">$0.00</h2>
+            </div>
+            
+            <div class="action-buttons">
+                <button id="trade-now-btn" class="action-btn inactive">Start Trading Now</button>
+                <button id="deposit-btn" class="action-btn">Deposit to My Wallet</button>
+            </div>
+            
+            <div id="insufficient-balance-msg" class="error-msg">
+                Insufficient trade balance. Deposit to your trade wallet first.
+            </div>
+        </div>
+
+        <!-- Deposit Screen -->
+        <div id="deposit-screen" class="screen">
+            <header>
+                <h1>Deposit Funds</h1>
+                <p>Scan to deposit to your wallet</p>
+            </header>
+            
+            <div class="payment-slip">
+                <img src="https://via.placeholder.com/300x450?text=Trust+Wallet+Payment+Slip" alt="Trust Wallet Payment Slip">
+                <p>Scan this QR code with Trust Wallet to deposit funds</p>
+            </div>
+            
+            <button id="back-to-dashboard-btn" class="action-btn">Back to Dashboard</button>
+        </div>
+    </div>
+
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            // DOM Elements
+            const createAccountBtn = document.getElementById('create-account-btn');
+            const tradeNowBtn = document.getElementById('trade-now-btn');
+            const depositBtn = document.getElementById('deposit-btn');
+            const backToDashboardBtn = document.getElementById('back-to-dashboard-btn');
+            const insufficientBalanceMsg = document.getElementById('insufficient-balance-msg');
+            const userNameElement = document.getElementById('user-name');
+            const accountBalanceElement = document.getElementById('account-balance');
+            
+            // Screens
+            const homeScreen = document.getElementById('home-screen');
+            const loadingScreen = document.getElementById('loading-screen');
+            const dashboardScreen = document.getElementById('dashboard-screen');
+            const depositScreen = document.getElementById('deposit-screen');
+            
+            // Initialize Web3
+            let web3;
+            let userAccount = null;
+            
+            // Check if Web3 is injected (MetaMask)
+            if (window.ethereum) {
+                web3 = new Web3(window.ethereum);
+            } else {
+                alert('Please install MetaMask or another Web3 provider to use this dApp!');
+            }
+            
+            // Event Listeners
+            createAccountBtn.addEventListener('click', connectWallet);
+            tradeNowBtn.addEventListener('click', showInsufficientBalance);
+            depositBtn.addEventListener('click', showDepositScreen);
+            backToDashboardBtn.addEventListener('click', showDashboard);
+            
+            // Functions
+            async function connectWallet() {
+                try {
+                    // Show loading screen
+                    homeScreen.classList.remove('active');
+                    loadingScreen.classList.add('active');
+                    
+                    // Request account access
+                    const accounts = await window.ethereum.request({ method: 'eth_requestAccounts' });
+                    userAccount = accounts[0];
+                    
+                    // Get user name (shortened address)
+                    const userName = `${userAccount.substring(0, 6)}...${userAccount.substring(userAccount.length - 4)}`;
+                    userNameElement.textContent = userName;
+                    
+                    // Simulate loading delay
+                    setTimeout(() => {
+                        loadingScreen.classList.remove('active');
+                        dashboardScreen.classList.add('active');
+                    }, 1500);
+                    
+                } catch (error) {
+                    console.error('Error connecting wallet:', error);
+                    loadingScreen.classList.remove('active');
+                    homeScreen.classList.add('active');
+                    alert('Failed to connect wallet. Please try again.');
+                }
+            }
+            
+            function showInsufficientBalance() {
+                insufficientBalanceMsg.style.display = 'block';
+                
+                // Hide message after 3 seconds
+                setTimeout(() => {
+                    insufficientBalanceMsg.style.display = 'none';
+                }, 3000);
+            }
+            
+            function showDepositScreen() {
+                dashboardScreen.classList.remove('active');
+                depositScreen.classList.add('active');
+            }
+            
+            function showDashboard() {
+                depositScreen.classList.remove('active');
+                dashboardScreen.classList.add('active');
+            }
+            
+            // Initialize with home screen active
+            homeScreen.classList.add('active');
+        });
+    </script>
+</body>
+</html>
