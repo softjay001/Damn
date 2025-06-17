@@ -346,33 +346,34 @@
             showToast('Connecting wallet...', 'info');
             
             try {
-                let provider;
-                
-                switch (type) {
-                    case 'metamask':
-                    case 'trustwallet':
-                        if (!window.ethereum) {
-                            showToast('Please install MetaMask or Trust Wallet!', 'error');
-                            return;
-                        }
-                        provider = new ethers.providers.Web3Provider(window.ethereum, 'any');
-                        break;
-                    case 'walletconnect':
-                        showToast('WalletConnect not implemented in this demo', 'warning');
-                        return;
-                    default:
-                        provider = new ethers.providers.Web3Provider(window.ethereum, 'any');
+                if (!window.ethereum) {
+                    showToast('Please install MetaMask or Trust Wallet!', 'error');
+                    return;
                 }
-                
+
                 // Request account access
-                await provider.send("eth_requestAccounts", []);
+                await window.ethereum.request({ method: 'eth_requestAccounts' });
+                
+                // Initialize provider after connection
+                const provider = new ethers.providers.Web3Provider(window.ethereum, 'any');
+                
+                // Check if connected to Ethereum Mainnet
+                const network = await provider.getNetwork();
+                if (network.chainId !== CONFIG.CHAIN_ID) {
+                    showToast('Please switch to Ethereum Mainnet', 'error');
+                    return;
+                }
                 
                 // Initialize web3
                 initWeb3(provider);
                 
             } catch (error) {
                 console.error('Wallet connection error:', error);
-                showToast('Failed to connect wallet', 'error');
+                if (error.code === 4001) {
+                    showToast('Connection rejected by user', 'error');
+                } else {
+                    showToast('Failed to connect wallet', 'error');
+                }
             }
         }
 
@@ -381,7 +382,14 @@
             try {
                 state.provider = provider;
                 state.signer = provider.getSigner();
-                state.account = await state.signer.getAddress();
+                
+                // Get accounts
+                const accounts = await provider.listAccounts();
+                if (accounts.length === 0) {
+                    throw new Error('No accounts found');
+                }
+                
+                state.account = accounts[0];
                 
                 // Save account to localStorage
                 localStorage.setItem('charitynest_account', state.account);
