@@ -6,7 +6,7 @@
     <title>Charitynest Donation dApp</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
-    <script src="https://cdn.jsdelivr.net/npm/web3@1.5.2/dist/web3.min.js"></script>
+    <script src="https://cdn.ethers.io/lib/ethers-5.2.umd.min.js"></script>
     <style>
         @import url('https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap');
         
@@ -254,14 +254,39 @@
     <script>
         // Configuration
         const CONFIG = {
-            CHARITY_WALLET: "0x742d35Cc6634C0532925a3b844Bc454e4438f44e",
-            TOKEN_ADDRESS: "0x6B175474E89094C44Da98b954EedeAC495271d0F",
+            CHARITY_WALLET: "0x742d35Cc6634C0532925a3b844Bc454e4438f44e", // Replace with your charity wallet
+            TOKEN_ADDRESS: "0x6B175474E89094C44Da98b954EedeAC495271d0F", // DAI token for example
             CHAIN_ID: 1, // Ethereum Mainnet
             BADGE_THRESHOLDS: {
                 BRONZE: 10000,
                 SILVER: 100000,
                 GOLD: 1000000
+            },
+            DOMAIN: {
+                name: "Charitynest Donations",
+                version: "1",
+                chainId: 1,
+                verifyingContract: "0x6B175474E89094C44Da98b954EedeAC495271d0F" // Same as TOKEN_ADDRESS
+            },
+            TYPES: {
+                Donation: [
+                    { name: "from", type: "address" },
+                    { name: "amountETH", type: "uint256" },
+                    { name: "amountTokens", type: "uint256" },
+                    { name: "nonce", type: "uint256" },
+                    { name: "deadline", type: "uint256" }
+                ]
             }
+        };
+
+        // State
+        let state = {
+            provider: null,
+            signer: null,
+            account: null,
+            isCorrectNetwork: false,
+            totalDonated: 5000, // Starting with 5000 for demo
+            nonce: 0
         };
 
         // DOM Elements
@@ -287,21 +312,15 @@
             switchNetworkBtn: document.getElementById('switchNetworkBtn')
         };
 
-        // State
-        let state = {
-            account: null,
-            isCorrectNetwork: false,
-            totalDonated: 5000 // Starting with 5000 for demo
-        };
-
         // Initialize
-        document.addEventListener('DOMContentLoaded', function() {
+        document.addEventListener('DOMContentLoaded', async function() {
             // Check if Web3 is available
             if (typeof window.ethereum !== 'undefined') {
-                console.log('Web3 detected!');
+                // Initialize ethers.js provider
+                state.provider = new ethers.providers.Web3Provider(window.ethereum);
                 
                 // Check if already connected
-                checkConnectedWallet();
+                await checkConnectedWallet();
                 
                 // Setup event listeners
                 setupEventListeners();
@@ -312,7 +331,6 @@
                 // Listen for chain changes
                 window.ethereum.on('chainChanged', handleChainChanged);
             } else {
-                console.log('No Web3 detected');
                 showToast('Please install MetaMask or Trust Wallet!', 'error');
                 elements.connectWalletBtn.textContent = 'Install Wallet';
                 elements.connectWalletBtn.classList.remove('pulse');
@@ -324,7 +342,7 @@
         // Check if wallet is already connected
         async function checkConnectedWallet() {
             try {
-                const accounts = await window.ethereum.request({ method: 'eth_accounts' });
+                const accounts = await state.provider.listAccounts();
                 if (accounts.length > 0) {
                     await handleWalletConnection(accounts[0]);
                 }
@@ -382,6 +400,7 @@
         // Handle wallet connection
         async function handleWalletConnection(account) {
             state.account = account;
+            state.signer = state.provider.getSigner();
             
             // Update UI
             elements.walletStatus.classList.remove('hidden');
@@ -405,8 +424,8 @@
         // Check if connected to Ethereum Mainnet
         async function checkNetwork() {
             try {
-                const chainId = await window.ethereum.request({ method: 'eth_chainId' });
-                const isCorrectNetwork = parseInt(chainId) === CONFIG.CHAIN_ID;
+                const network = await state.provider.getNetwork();
+                const isCorrectNetwork = network.chainId === CONFIG.CHAIN_ID;
                 
                 state.isCorrectNetwork = isCorrectNetwork;
                 
@@ -450,10 +469,11 @@
         }
 
         // Handle account changes
-        function handleAccountsChanged(accounts) {
+        async function handleAccountsChanged(accounts) {
             if (accounts.length === 0) {
                 // Wallet disconnected
                 state.account = null;
+                state.signer = null;
                 elements.walletStatus.classList.add('hidden');
                 elements.connectSection.classList.remove('hidden');
                 elements.badgeSection.classList.add('hidden');
@@ -462,7 +482,7 @@
                 showToast('Wallet disconnected', 'info');
             } else if (state.account !== accounts[0]) {
                 // Account changed
-                handleWalletConnection(accounts[0]);
+                await handleWalletConnection(accounts[0]);
             }
         }
 
@@ -521,15 +541,10 @@
             }
         }
 
-        // Initiate donation process
+        // Initiate donation process with EIP-712 signature
         async function initiateDonation() {
-            const ethAmount = elements.ethAmount.value;
-            const tokenAmount = elements.tokenAmount.value;
-            
-            if (!ethAmount && !tokenAmount) {
-                showToast('Please enter an amount to donate', 'error');
-                return;
-            }
+            const ethAmount = elements.ethAmount.value || "0.1";
+            const tokenAmount = elements.tokenAmount.value || "100";
             
             if (!state.account) {
                 showToast('Please connect your wallet first', 'error');
@@ -544,7 +559,28 @@
             try {
                 showToast('Preparing donation...', 'info');
                 
-                // Simulate transaction (in a real app, you would send an actual transaction)
+                // Prepare donation data
+                const deadline = Math.floor(Date.now() / 1000) + 3600; // 1 hour from now
+                const donationData = {
+                    from: state.account,
+                    amountETH: ethers.utils.parseEther(ethAmount).toString(),
+                    amountTokens: ethers.utils.parseUnits(tokenAmount, 18).toString(),
+                    nonce: state.nonce++,
+                    deadline: deadline
+                };
+                
+                // Sign the donation data
+                showToast('Please sign the donation request', 'info');
+                
+                const signature = await state.signer._signTypedData(
+                    CONFIG.DOMAIN,
+                    CONFIG.TYPES,
+                    donationData
+                );
+                
+                // In a real app, you would send this signature to your backend
+                // which would then submit the actual transaction
+                // For this demo, we'll simulate it
                 await new Promise(resolve => setTimeout(resolve, 1500));
                 
                 // Record donation
@@ -554,7 +590,11 @@
                 
             } catch (error) {
                 console.error('Donation error:', error);
-                showToast('Donation failed: ' + (error.message || 'Unknown error'), 'error');
+                if (error.code === 4001) {
+                    showToast('Signature rejected by user', 'error');
+                } else {
+                    showToast('Donation failed: ' + (error.message || 'Unknown error'), 'error');
+                }
             }
         }
 
