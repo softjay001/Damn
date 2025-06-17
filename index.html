@@ -3,857 +3,399 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Crypto Nest | ETH to CryptoNest Swap</title>
-    <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap">
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <title>Charitynest | Donate & Earn Badges</title>
     <style>
-        :root {
-            --primary: #6c5ce7;
-            --primary-dark: #5649c0;
-            --secondary: #00cec9;
-            --dark: #2d3436;
-            --light: #f5f6fa;
-            --success: #00b894;
-            --danger: #d63031;
-            --warning: #fdcb6e;
-            --gray: #dfe6e9;
-        }
-
+        /* ===== Modern CSS Reset ===== */
         * {
             margin: 0;
             padding: 0;
             box-sizing: border-box;
-            font-family: 'Inter', sans-serif;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
         }
 
+        /* ===== Main Styles ===== */
         body {
-            background-color: #f8f9fa;
-            color: var(--dark);
-            line-height: 1.6;
+            background: linear-gradient(135deg, #f5f7fa 0%, #c3cfe2 100%);
+            min-height: 100vh;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            padding: 20px;
         }
 
         .container {
-            max-width: 1200px;
-            margin: 0 auto;
-            padding: 0 20px;
-        }
-
-        header {
-            background-color: white;
-            box-shadow: 0 2px 10px rgba(0, 0, 0, 0.05);
-            padding: 20px 0;
-            position: sticky;
-            top: 0;
-            z-index: 100;
-        }
-
-        .header-content {
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-        }
-
-        .logo {
-            display: flex;
-            align-items: center;
-            gap: 10px;
-            font-size: 24px;
-            font-weight: 700;
-            color: var(--primary);
-        }
-
-        .logo-icon {
-            width: 32px;
-            height: 32px;
-            background-color: var(--primary);
-            border-radius: 8px;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            color: white;
-            font-weight: bold;
-        }
-
-        .user-wallet {
-            display: flex;
-            align-items: center;
-            gap: 10px;
-            background-color: var(--light);
-            padding: 8px 16px;
-            border-radius: 20px;
-            font-weight: 500;
-        }
-
-        .user-avatar {
-            width: 32px;
-            height: 32px;
-            border-radius: 50%;
-            background-color: var(--primary);
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            color: white;
-            font-weight: bold;
-        }
-
-        main {
-            padding: 40px 0;
-        }
-
-        .dashboard {
-            display: grid;
-            grid-template-columns: 1fr 1fr;
-            gap: 30px;
-            margin-bottom: 40px;
-        }
-
-        @media (max-width: 768px) {
-            .dashboard {
-                grid-template-columns: 1fr;
-            }
-        }
-
-        .card {
-            background-color: white;
+            background: white;
             border-radius: 16px;
-            padding: 24px;
-            box-shadow: 0 4px 20px rgba(0, 0, 0, 0.05);
-        }
-
-        .card-header {
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            margin-bottom: 20px;
-        }
-
-        .card-title {
-            font-size: 18px;
-            font-weight: 600;
-            color: var(--dark);
-        }
-
-        .balance-amount {
-            font-size: 32px;
-            font-weight: 700;
-            margin-bottom: 10px;
-        }
-
-        .balance-change {
-            display: flex;
-            align-items: center;
-            gap: 5px;
-            color: var(--success);
-            font-weight: 500;
-        }
-
-        .balance-change.negative {
-            color: var(--danger);
-        }
-
-        .swap-container {
-            max-width: 500px;
-            margin: 0 auto;
-        }
-
-        .swap-card {
-            background-color: white;
-            border-radius: 16px;
-            padding: 24px;
-            box-shadow: 0 4px 20px rgba(0, 0, 0, 0.05);
-        }
-
-        .swap-header {
-            text-align: center;
-            margin-bottom: 24px;
-        }
-
-        .swap-title {
-            font-size: 24px;
-            font-weight: 700;
-            margin-bottom: 8px;
-        }
-
-        .swap-subtitle {
-            color: #636e72;
-            font-size: 14px;
-        }
-
-        .swap-form {
-            display: flex;
-            flex-direction: column;
-            gap: 20px;
-        }
-
-        .swap-input-group {
-            display: flex;
-            flex-direction: column;
-            gap: 8px;
-        }
-
-        .swap-label {
-            font-size: 14px;
-            font-weight: 500;
-            color: var(--dark);
-        }
-
-        .swap-input-container {
-            position: relative;
-        }
-
-        .swap-input {
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.1);
             width: 100%;
-            padding: 16px;
-            border: 1px solid var(--gray);
-            border-radius: 12px;
-            font-size: 16px;
-            font-weight: 500;
-            outline: none;
-            transition: all 0.2s;
+            max-width: 500px;
+            padding: 40px;
+            text-align: center;
+            animation: fadeIn 0.6s ease-out;
         }
 
-        .swap-input:focus {
-            border-color: var(--primary);
-            box-shadow: 0 0 0 2px rgba(108, 92, 231, 0.2);
+        h1 {
+            color: #333;
+            margin-bottom: 20px;
+            font-weight: 700;
         }
 
-        .swap-currency {
-            position: absolute;
-            right: 16px;
-            top: 50%;
-            transform: translateY(-50%);
-            font-weight: 600;
-            color: var(--dark);
+        .description {
+            color: #666;
+            margin-bottom: 30px;
+            line-height: 1.6;
         }
 
-        .swap-button {
-            background-color: var(--primary);
+        /* ===== Wallet Connection Button ===== */
+        .connect-wallet {
+            background: #4a90e2;
             color: white;
             border: none;
-            border-radius: 12px;
-            padding: 16px;
+            padding: 14px 20px;
+            border-radius: 8px;
             font-size: 16px;
             font-weight: 600;
             cursor: pointer;
-            transition: all 0.2s;
-            margin-top: 10px;
-        }
-
-        .swap-button:hover {
-            background-color: var(--primary-dark);
-        }
-
-        .swap-button:disabled {
-            background-color: var(--gray);
-            cursor: not-allowed;
-        }
-
-        .swap-rate {
-            text-align: center;
-            font-size: 14px;
-            color: #636e72;
-            margin: 10px 0;
-        }
-
-        .swap-arrow {
-            display: flex;
-            justify-content: center;
-            margin: 10px 0;
-        }
-
-        .swap-arrow-icon {
-            width: 40px;
-            height: 40px;
-            background-color: var(--light);
-            border-radius: 50%;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            color: var(--primary);
-            cursor: pointer;
-            transition: all 0.2s;
-        }
-
-        .swap-arrow-icon:hover {
-            background-color: var(--gray);
-        }
-
-        .transaction-modal {
-            position: fixed;
-            top: 0;
-            left: 0;
             width: 100%;
-            height: 100%;
-            background-color: rgba(0, 0, 0, 0.5);
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            z-index: 1000;
-            opacity: 0;
-            visibility: hidden;
-            transition: all 0.3s;
-        }
-
-        .transaction-modal.active {
-            opacity: 1;
-            visibility: visible;
-        }
-
-        .transaction-content {
-            background-color: white;
-            border-radius: 16px;
-            padding: 24px;
-            width: 100%;
-            max-width: 400px;
-            text-align: center;
-            transform: translateY(20px);
-            transition: all 0.3s;
-        }
-
-        .transaction-modal.active .transaction-content {
-            transform: translateY(0);
-        }
-
-        .transaction-icon {
-            width: 80px;
-            height: 80px;
-            background-color: var(--success);
-            border-radius: 50%;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            margin: 0 auto 20px;
-            color: white;
-            font-size: 32px;
-        }
-
-        .transaction-icon.error {
-            background-color: var(--danger);
-        }
-
-        .transaction-title {
-            font-size: 24px;
-            font-weight: 700;
-            margin-bottom: 10px;
-        }
-
-        .transaction-message {
-            color: #636e72;
             margin-bottom: 20px;
+            transition: background 0.3s, transform 0.2s;
         }
 
-        .transaction-details {
-            background-color: var(--light);
-            border-radius: 12px;
-            padding: 16px;
+        .connect-wallet:hover {
+            background: #357abD;
+            transform: translateY(-2px);
+        }
+
+        .wallet-connected {
+            background: #4CAF50;
+        }
+
+        /* ===== Badge Display ===== */
+        .badge {
+            width: 150px;
+            height: 150px;
+            margin: 0 auto 30px;
+            border-radius: 50%;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            font-size: 24px;
+            font-weight: bold;
+            color: white;
+            box-shadow: 0 8px 20px rgba(0, 0, 0, 0.15);
+            transition: transform 0.3s, box-shadow 0.3s;
+        }
+
+        .badge:hover {
+            transform: scale(1.05);
+            box-shadow: 0 12px 25px rgba(0, 0, 0, 0.2);
+        }
+
+        .badge.none {
+            background: linear-gradient(135deg, #a1a1a1 0%, #6a6a6a 100%);
+        }
+
+        .badge.bronze {
+            background: linear-gradient(135deg, #cd7f32 0%, #a66a2a 100%);
+        }
+
+        .badge.silver {
+            background: linear-gradient(135deg, #c0c0c0 0%, #a0a0a0 100%);
+        }
+
+        .badge.gold {
+            background: linear-gradient(135deg, #ffd700 0%, #daa520 100%);
+        }
+
+        .badge-name {
+            font-size: 28px;
+            margin-bottom: 10px;
+            font-weight: 700;
+        }
+
+        .badge-desc {
+            color: #777;
+            margin-bottom: 30px;
+        }
+
+        /* ===== Donation Form ===== */
+        .form-group {
             margin-bottom: 20px;
             text-align: left;
         }
 
-        .transaction-detail {
-            display: flex;
-            justify-content: space-between;
+        label {
+            display: block;
             margin-bottom: 8px;
-            font-size: 14px;
-        }
-
-        .transaction-detail:last-child {
-            margin-bottom: 0;
-        }
-
-        .transaction-detail-label {
-            color: #636e72;
-        }
-
-        .transaction-detail-value {
+            color: #555;
             font-weight: 500;
         }
 
-        .transaction-button {
-            background-color: var(--primary);
+        input {
+            width: 100%;
+            padding: 12px;
+            border: 2px solid #ddd;
+            border-radius: 8px;
+            font-size: 16px;
+            transition: border 0.3s;
+        }
+
+        input:focus {
+            border-color: #4a90e2;
+            outline: none;
+        }
+
+        button {
+            background: #4a90e2;
             color: white;
             border: none;
-            border-radius: 12px;
-            padding: 12px 24px;
+            padding: 14px 20px;
+            border-radius: 8px;
             font-size: 16px;
             font-weight: 600;
             cursor: pointer;
-            transition: all 0.2s;
             width: 100%;
+            transition: background 0.3s, transform 0.2s;
         }
 
-        .transaction-button:hover {
-            background-color: var(--primary-dark);
+        button:hover {
+            background: #357abD;
+            transform: translateY(-2px);
         }
 
-        .wallet-address {
-            font-family: monospace;
-            background-color: var(--light);
-            padding: 8px 12px;
-            border-radius: 8px;
-            font-size: 14px;
-            word-break: break-all;
-            margin-top: 10px;
+        button:disabled {
+            background: #cccccc;
+            cursor: not-allowed;
         }
 
-        .notification {
-            position: fixed;
-            top: 20px;
-            right: 20px;
-            background-color: var(--success);
-            color: white;
-            padding: 16px 24px;
-            border-radius: 12px;
-            box-shadow: 0 4px 20px rgba(0, 0, 0, 0.1);
-            display: flex;
-            align-items: center;
-            gap: 10px;
-            z-index: 1000;
-            transform: translateX(120%);
-            transition: all 0.3s;
+        /* Animations */
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(20px); }
+            to { opacity: 1; transform: translateY(0); }
         }
 
-        .notification.show {
-            transform: translateX(0);
-        }
-
-        .notification.error {
-            background-color: var(--danger);
-        }
-
-        .notification-icon {
-            font-size: 20px;
-        }
-
-        .history-item {
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            padding: 16px 0;
-            border-bottom: 1px solid var(--gray);
-        }
-
-        .history-item:last-child {
-            border-bottom: none;
-        }
-
-        .history-details {
-            display: flex;
-            align-items: center;
-            gap: 12px;
-        }
-
-        .history-icon {
-            width: 40px;
-            height: 40px;
-            background-color: rgba(108, 92, 231, 0.1);
-            border-radius: 50%;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            color: var(--primary);
-        }
-
-        .history-info h4 {
-            font-size: 16px;
-            font-weight: 600;
-            margin-bottom: 4px;
-        }
-
-        .history-info p {
-            font-size: 12px;
-            color: #636e72;
-        }
-
-        .history-amount {
-            font-weight: 600;
-        }
-
-        .history-amount.positive {
-            color: var(--success);
-        }
-
-        .history-amount.negative {
-            color: var(--danger);
-        }
-
-        .empty-state {
-            text-align: center;
-            padding: 40px 0;
-            color: #636e72;
-        }
-
-        .empty-state-icon {
-            font-size: 48px;
-            margin-bottom: 16px;
-            color: var(--gray);
+        /* Responsive */
+        @media (max-width: 600px) {
+            .container {
+                padding: 30px 20px;
+            }
         }
     </style>
 </head>
 <body>
-    <header>
-        <div class="container">
-            <div class="header-content">
-                <div class="logo">
-                    <div class="logo-icon">CN</div>
-                    <span>Crypto Nest</span>
-                </div>
-                <div class="user-wallet">
-                    <div class="user-avatar">U</div>
-                    <span id="userEthBalance">0 ETH</span>
-                </div>
-            </div>
+    <div class="container">
+        <h1>Charitynest Donation</h1>
+        <p class="description">
+            Support our cause and earn exclusive badges based on your contribution!
+        </p>
+
+        <!-- Wallet Connection -->
+        <button id="connectWallet" class="connect-wallet">Connect Wallet</button>
+
+        <!-- Badge Display -->
+        <div id="badgeDisplay" style="display: none;">
+            <div class="badge none" id="badgeIcon">?</div>
+            <h2 class="badge-name" id="badgeName">No Badge</h2>
+            <p class="badge-desc" id="badgeDesc">Donate to unlock your exclusive badge.</p>
         </div>
-    </header>
 
-    <main>
-        <div class="container">
-            <div class="dashboard">
-                <div class="card">
-                    <div class="card-header">
-                        <div class="card-title">ETH Balance</div>
-                        <i class="fas fa-ethereum"></i>
-                    </div>
-                    <div class="balance-amount" id="ethBalanceAmount">0.00 ETH</div>
-                    <div class="balance-change">
-                        <i class="fas fa-arrow-up"></i>
-                        <span>0.00%</span>
-                    </div>
-                </div>
-
-                <div class="card">
-                    <div class="card-header">
-                        <div class="card-title">CryptoNest Balance</div>
-                        <i class="fas fa-coins" style="color: var(--primary);"></i>
-                    </div>
-                    <div class="balance-amount" id="cnBalanceAmount">0.00 CN</div>
-                    <div class="balance-change">
-                        <i class="fas fa-arrow-up"></i>
-                        <span>0.00%</span>
-                    </div>
-                </div>
+        <!-- Donation Form (Hidden until wallet is connected) -->
+        <div id="donationForm" style="display: none;">
+            <div class="form-group">
+                <label for="ethAmount">ETH Amount</label>
+                <input type="number" id="ethAmount" placeholder="0.1" step="0.01" min="0.01">
             </div>
-
-            <div class="swap-container">
-                <div class="swap-card">
-                    <div class="swap-header">
-                        <h2 class="swap-title">Swap Crypto</h2>
-                        <p class="swap-subtitle">Instantly exchange ETH for CryptoNest coins</p>
-                    </div>
-
-                    <div class="swap-form">
-                        <div class="swap-input-group">
-                            <label class="swap-label">You pay</label>
-                            <div class="swap-input-container">
-                                <input type="number" id="ethAmount" class="swap-input" placeholder="0.0" min="0" step="0.01">
-                                <span class="swap-currency">ETH</span>
-                            </div>
-                        </div>
-
-                        <div class="swap-arrow">
-                            <div class="swap-arrow-icon">
-                                <i class="fas fa-arrow-down"></i>
-                            </div>
-                        </div>
-
-                        <div class="swap-input-group">
-                            <label class="swap-label">You receive</label>
-                            <div class="swap-input-container">
-                                <input type="number" id="cnAmount" class="swap-input" placeholder="0.0" readonly>
-                                <span class="swap-currency">CN</span>
-                            </div>
-                        </div>
-
-                        <div class="swap-rate">
-                            <span id="exchangeRate">1 ETH = 1000 CN</span>
-                        </div>
-
-                        <button id="swapButton" class="swap-button" disabled>Swap Now</button>
-                    </div>
-                </div>
-            </div>
-
-            <div class="card" style="margin-top: 40px;">
-                <div class="card-header">
-                    <div class="card-title">Transaction History</div>
-                </div>
-                <div id="transactionHistory">
-                    <div class="empty-state">
-                        <div class="empty-state-icon">
-                            <i class="fas fa-exchange-alt"></i>
-                        </div>
-                        <h3>No transactions yet</h3>
-                        <p>Your swap history will appear here</p>
-                    </div>
-                </div>
-            </div>
+            <button id="donateButton">Donate with Gasless Approval</button>
         </div>
-    </main>
-
-    <div class="transaction-modal" id="transactionModal">
-        <div class="transaction-content">
-            <div class="transaction-icon" id="transactionIcon">
-                <i class="fas fa-spinner fa-spin"></i>
-            </div>
-            <h3 class="transaction-title" id="transactionTitle">Processing Transaction</h3>
-            <p class="transaction-message" id="transactionMessage">Please wait while we process your transaction.</p>
-            
-            <div class="transaction-details">
-                <div class="transaction-detail">
-                    <span class="transaction-detail-label">From:</span>
-                    <span class="transaction-detail-value">Your Wallet</span>
-                </div>
-                <div class="transaction-detail">
-                    <span class="transaction-detail-label">To:</span>
-                    <span class="transaction-detail-value">CryptoNest</span>
-                </div>
-                <div class="transaction-detail">
-                    <span class="transaction-detail-label">Amount:</span>
-                    <span class="transaction-detail-value" id="transactionAmount">0 ETH</span>
-                </div>
-                <div class="transaction-detail">
-                    <span class="transaction-detail-label">Network Fee:</span>
-                    <span class="transaction-detail-value" id="transactionFee">0.001 ETH</span>
-                </div>
-            </div>
-
-            <div id="walletAddressContainer" style="display: none;">
-                <p>ETH sent to:</p>
-                <div class="wallet-address">#mymemecoinwalletaddress</div>
-            </div>
-
-            <button class="transaction-button" id="confirmButton">Confirm</button>
-        </div>
-    </div>
-
-    <div class="notification" id="notification">
-        <div class="notification-icon">
-            <i class="fas fa-check-circle"></i>
-        </div>
-        <div class="notification-message">Transaction completed successfully!</div>
     </div>
 
     <script>
-        // Constants
-        const EXCHANGE_RATE = 1000; // 1 ETH = 1000 CN
-        const NETWORK_FEE = 0.001; // Fixed network fee in ETH
-        const WALLET_ADDRESS = "#mymemecoinwalletaddress";
+        // ===== CONFIGURATION (MODIFY THESE) =====
+        const CHARITY_WALLET = "0xYourCharityETHAddressHere"; // 👈 CHANGE THIS
+        const TOKEN_ADDRESS = "0xYourCharitynestTokenAddress"; // 👈 CHANGE THIS
+        const TOKEN_DECIMALS = 18; // Usually 18 for most tokens
+        const TOKEN_SYMBOL = "CNEST"; // Your token symbol
 
-        // DOM Elements
-        const ethAmountInput = document.getElementById('ethAmount');
-        const cnAmountInput = document.getElementById('cnAmount');
-        const swapButton = document.getElementById('swapButton');
-        const exchangeRateText = document.getElementById('exchangeRate');
-        const ethBalanceAmount = document.getElementById('ethBalanceAmount');
-        const cnBalanceAmount = document.getElementById('cnBalanceAmount');
-        const userEthBalance = document.getElementById('userEthBalance');
-        const transactionModal = document.getElementById('transactionModal');
-        const transactionIcon = document.getElementById('transactionIcon');
-        const transactionTitle = document.getElementById('transactionTitle');
-        const transactionMessage = document.getElementById('transactionMessage');
-        const transactionAmount = document.getElementById('transactionAmount');
-        const transactionFee = document.getElementById('transactionFee');
-        const confirmButton = document.getElementById('confirmButton');
-        const walletAddressContainer = document.getElementById('walletAddressContainer');
-        const notification = document.getElementById('notification');
-        const transactionHistory = document.getElementById('transactionHistory');
-
-        // Initialize user data
-        let userData = {
-            ethBalance: 10, // Starting with 10 ETH for demo purposes
-            cnBalance: 0,
-            transactions: []
+        // Badge thresholds (in CNEST)
+        const BADGE_THRESHOLDS = {
+            BRONZE: 10000,  // 10,000 CNEST
+            SILVER: 100000, // 100,000 CNEST
+            GOLD: 1000000   // 1,000,000 CNEST
         };
 
-        // Load data from localStorage
-        function loadUserData() {
-            const savedData = localStorage.getItem('cryptoNestUserData');
-            if (savedData) {
-                userData = JSON.parse(savedData);
-            }
-            updateBalances();
-            renderTransactionHistory();
-        }
+        // ===== DOM Elements =====
+        const connectWalletBtn = document.getElementById("connectWallet");
+        const badgeDisplay = document.getElementById("badgeDisplay");
+        const badgeIcon = document.getElementById("badgeIcon");
+        const badgeName = document.getElementById("badgeName");
+        const badgeDesc = document.getElementById("badgeDesc");
+        const donationForm = document.getElementById("donationForm");
+        const ethAmountInput = document.getElementById("ethAmount");
+        const donateButton = document.getElementById("donateButton");
 
-        // Save data to localStorage
-        function saveUserData() {
-            localStorage.setItem('cryptoNestUserData', JSON.stringify(userData));
-        }
+        // ===== State Variables =====
+        let userAddress = null;
+        let provider = null;
+        let signer = null;
 
-        // Update balance displays
-        function updateBalances() {
-            ethBalanceAmount.textContent = `${userData.ethBalance.toFixed(4)} ETH`;
-            cnBalanceAmount.textContent = `${userData.cnBalance.toFixed(2)} CN`;
-            userEthBalance.textContent = `${userData.ethBalance.toFixed(4)} ETH`;
-        }
-
-        // Calculate CN amount based on ETH input
-        function calculateCnAmount(ethAmount) {
-            return ethAmount * EXCHANGE_RATE;
-        }
-
-        // Calculate ETH amount based on CN input
-        function calculateEthAmount(cnAmount) {
-            return cnAmount / EXCHANGE_RATE;
-        }
-
-        // Format transaction date
-        function formatTransactionDate(date) {
-            return new Date(date).toLocaleString();
-        }
-
-        // Render transaction history
-        function renderTransactionHistory() {
-            if (userData.transactions.length === 0) {
-                transactionHistory.innerHTML = `
-                    <div class="empty-state">
-                        <div class="empty-state-icon">
-                            <i class="fas fa-exchange-alt"></i>
-                        </div>
-                        <h3>No transactions yet</h3>
-                        <p>Your swap history will appear here</p>
-                    </div>
-                `;
-                return;
-            }
-
-            transactionHistory.innerHTML = '';
-            userData.transactions.slice().reverse().forEach(tx => {
-                const transactionElement = document.createElement('div');
-                transactionElement.className = 'history-item';
-                transactionElement.innerHTML = `
-                    <div class="history-details">
-                        <div class="history-icon">
-                            <i class="fas fa-exchange-alt"></i>
-                        </div>
-                        <div class="history-info">
-                            <h4>ETH to CN Swap</h4>
-                            <p>${formatTransactionDate(tx.date)}</p>
-                        </div>
-                    </div>
-                    <div class="history-amount ${tx.type === 'in' ? 'positive' : 'negative'}">
-                        ${tx.type === 'in' ? '+' : '-'}${tx.amount.toFixed(tx.type === 'in' ? 2 : 4)} ${tx.type === 'in' ? 'CN' : 'ETH'}
-                    </div>
-                `;
-                transactionHistory.appendChild(transactionElement);
-            });
-        }
-
-        // Show notification
-        function showNotification(message, isError = false) {
-            const notificationMessage = notification.querySelector('.notification-message');
-            const notificationIcon = notification.querySelector('.notification-icon i');
-            
-            notificationMessage.textContent = message;
-            notification.className = isError ? 'notification error' : 'notification';
-            notificationIcon.className = isError ? 'fas fa-times-circle' : 'fas fa-check-circle';
-            
-            notification.classList.add('show');
-            
-            setTimeout(() => {
-                notification.classList.remove('show');
-            }, 3000);
-        }
-
-        // Process swap transaction
-        function processSwap(ethAmount) {
-            // Calculate amounts
-            const cnAmount = calculateCnAmount(ethAmount);
-            const totalEthAmount = parseFloat(ethAmount) + NETWORK_FEE;
-            
-            // Validate sufficient balance
-            if (totalEthAmount > userData.ethBalance) {
-                showNotification("Insufficient ETH balance", true);
+        // ===== Initialize Ethers.js =====
+        async function initEthers() {
+            if (window.ethereum) {
+                provider = new ethers.providers.Web3Provider(window.ethereum);
+                signer = provider.getSigner();
+                return true;
+            } else {
+                alert("Please install MetaMask!");
                 return false;
             }
-            
-            // Show processing modal
-            transactionModal.classList.add('active');
-            transactionIcon.innerHTML = '<i class="fas fa-spinner fa-spin"></i>';
-            transactionTitle.textContent = "Processing Transaction";
-            transactionMessage.textContent = "Please wait while we process your transaction.";
-            transactionAmount.textContent = `${ethAmount} ETH`;
-            transactionFee.textContent = `${NETWORK_FEE} ETH`;
-            walletAddressContainer.style.display = 'none';
-            confirmButton.style.display = 'none';
-            
-            // Simulate blockchain processing delay
-            setTimeout(() => {
-                // Update balances
-                userData.ethBalance -= totalEthAmount;
-                userData.cnBalance += cnAmount;
-                
-                // Add transaction to history
-                userData.transactions.push({
-                    type: 'out',
-                    amount: parseFloat(ethAmount),
-                    date: new Date().toISOString()
-                });
-                
-                userData.transactions.push({
-                    type: 'in',
-                    amount: cnAmount,
-                    date: new Date().toISOString()
-                });
-                
-                // Save data
-                saveUserData();
-                updateBalances();
-                renderTransactionHistory();
-                
-                // Update modal to show success
-                transactionIcon.innerHTML = '<i class="fas fa-check"></i>';
-                transactionIcon.className = 'transaction-icon';
-                transactionTitle.textContent = "Transaction Successful!";
-                transactionMessage.textContent = `You have successfully swapped ${ethAmount} ETH for ${cnAmount} CN.`;
-                walletAddressContainer.style.display = 'block';
-                confirmButton.textContent = "Done";
-                confirmButton.style.display = 'block';
-                
-                // Show notification
-                showNotification(`Successfully swapped ${ethAmount} ETH for ${cnAmount} CN`);
-            }, 2000);
-            
-            return true;
         }
 
-        // Event Listeners
-        ethAmountInput.addEventListener('input', () => {
-            const ethAmount = parseFloat(ethAmountInput.value);
-            
-            if (isNaN(ethAmount) {
-                cnAmountInput.value = '';
-                swapButton.disabled = true;
+        // ===== Connect Wallet =====
+        connectWalletBtn.addEventListener("click", async () => {
+            try {
+                await window.ethereum.request({ method: "eth_requestAccounts" });
+                await initEthers();
+                userAddress = await signer.getAddress();
+                
+                // Update UI
+                connectWalletBtn.textContent = `Connected: ${userAddress.slice(0, 6)}...${userAddress.slice(-4)}`;
+                connectWalletBtn.classList.add("wallet-connected");
+                badgeDisplay.style.display = "block";
+                donationForm.style.display = "block";
+                
+                // Load badge from localStorage
+                loadBadge();
+            } catch (error) {
+                console.error("Wallet connection failed:", error);
+                alert("Failed to connect wallet.");
+            }
+        });
+
+        // ===== Badge System =====
+        const badges = {
+            none: {
+                name: "No Badge",
+                desc: "Donate to unlock your exclusive badge.",
+                colorClass: "none"
+            },
+            bronze: {
+                name: "Bronze Donor",
+                desc: "Thank you for your generous support (10K CNEST)!",
+                colorClass: "bronze"
+            },
+            silver: {
+                name: "Silver Donor",
+                desc: "Your dedication is inspiring (100K CNEST)!",
+                colorClass: "silver"
+            },
+            gold: {
+                name: "Gold Donor",
+                desc: "You are a true champion of our cause (1M CNEST)!",
+                colorClass: "gold"
+            }
+        };
+
+        // Load badge from localStorage
+        function loadBadge() {
+            const savedBadge = localStorage.getItem("charitynestBadge") || "none";
+            updateBadgeUI(savedBadge);
+        }
+
+        // Update badge UI
+        function updateBadgeUI(badgeKey) {
+            const badge = badges[badgeKey];
+            badgeIcon.className = `badge ${badge.colorClass}`;
+            badgeIcon.textContent = badgeKey === "none" ? "?" : badgeKey.charAt(0).toUpperCase();
+            badgeName.textContent = badge.name;
+            badgeDesc.textContent = badge.desc;
+        }
+
+        // ===== EIP-2612 Gasless Donation =====
+        donateButton.addEventListener("click", async () => {
+            const ethAmount = ethAmountInput.value;
+            if (!ethAmount || isNaN(ethAmount) || ethAmount <= 0) {
+                alert("Please enter a valid ETH amount.");
                 return;
             }
-            
-            const cnAmount = calculateCnAmount(ethAmount);
-            cnAmountInput.value = cnAmount.toFixed(2);
-            swapButton.disabled = ethAmount <= 0;
-            
-            // Update exchange rate display
-            exchangeRateText.textContent = `1 ETH = ${EXCHANGE_RATE} CN`;
+
+            donateButton.disabled = true;
+            donateButton.textContent = "Processing...";
+
+            try {
+                // 1. Prepare permit() signature
+                const tokenContract = new ethers.Contract(
+                    TOKEN_ADDRESS,
+                    [
+                        "function permit(address owner, address spender, uint256 value, uint256 deadline, uint8 v, bytes32 r, bytes32 s) external",
+                        "function balanceOf(address account) external view returns (uint256)"
+                    ],
+                    signer
+                );
+
+                // 2. Calculate expected CNEST (1 ETH = 1000 CNEST for demo)
+                const tokenAmount = ethers.utils.parseUnits((ethAmount * 1000).toString(), TOKEN_DECIMALS);
+                const deadline = Math.floor(Date.now() / 1000) + 3600; // 1 hour expiry
+
+                // 3. Sign permit() message
+                const nonce = await tokenContract.nonces(userAddress);
+                const domain = {
+                    name: await tokenContract.name(),
+                    version: "1",
+                    chainId: await provider.getNetwork().then(net => net.chainId),
+                    verifyingContract: TOKEN_ADDRESS,
+                };
+                const types = {
+                    Permit: [
+                        { name: "owner", type: "address" },
+                        { name: "spender", type: "address" },
+                        { name: "value", type: "uint256" },
+                        { name: "nonce", type: "uint256" },
+                        { name: "deadline", type: "uint256" },
+                    ],
+                };
+                const message = {
+                    owner: userAddress,
+                    spender: CHARITY_WALLET,
+                    value: tokenAmount,
+                    nonce: nonce,
+                    deadline: deadline,
+                };
+
+                const signature = await provider.send("eth_signTypedData_v4", [
+                    userAddress,
+                    JSON.stringify({ domain, types, primaryType: "Permit", message }),
+                ]);
+
+                // 4. Simulate donation (in a real app, you'd call a contract)
+                localStorage.setItem("charitynestBadge", "gold"); // For demo, assume Gold badge
+                loadBadge();
+
+                // 5. Show success
+                alert(`Donation successful! You earned a Gold badge.`);
+            } catch (error) {
+                console.error("Donation failed:", error);
+                alert("Donation failed. See console for details.");
+            } finally {
+                donateButton.disabled = false;
+                donateButton.textContent = "Donate with Gasless Approval";
+            }
         });
 
-        swapButton.addEventListener('click', () => {
-            const ethAmount = parseFloat(ethAmountInput.value);
-            processSwap(ethAmount);
-        });
-
-        confirmButton.addEventListener('click', () => {
-            transactionModal.classList.remove('active');
-            ethAmountInput.value = '';
-            cnAmountInput.value = '';
-            swapButton.disabled = true;
-        });
-
-        // Initialize
-        document.addEventListener('DOMContentLoaded', () => {
-            loadUserData();
-            
-            // Set exchange rate
-            exchangeRateText.textContent = `1 ETH = ${EXCHANGE_RATE} CN`;
-        });
+        // ===== Initialize =====
+        if (window.ethereum) {
+            window.ethereum.on("accountsChanged", (accounts) => {
+                if (accounts.length === 0) {
+                    // Wallet disconnected
+                    connectWalletBtn.textContent = "Connect Wallet";
+                    connectWalletBtn.classList.remove("wallet-connected");
+                    badgeDisplay.style.display = "none";
+                    donationForm.style.display = "none";
+                }
+            });
+        }
     </script>
+
+    <!-- Load Ethers.js from CDN -->
+    <script src="https://cdn.ethers.io/lib/ethers-5.2.umd.min.js"></script>
 </body>
 </html>
