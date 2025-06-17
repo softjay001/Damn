@@ -100,6 +100,16 @@
             transform: translateY(-5px);
             box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1), 0 4px 6px -2px rgba(0, 0, 0, 0.05);
         }
+        
+        .network-error {
+            background-color: #ef4444;
+            color: white;
+            padding: 8px 16px;
+            border-radius: 8px;
+            text-align: center;
+            margin-bottom: 16px;
+            display: none;
+        }
     </style>
 </head>
 <body class="min-h-screen flex flex-col">
@@ -116,6 +126,12 @@
             </button>
         </div>
     </header>
+
+    <!-- Network Error Banner -->
+    <div id="networkErrorBanner" class="network-error">
+        <p>⚠️ Please switch to <strong>Ethereum Mainnet</strong> to use this dApp.</p>
+        <button id="switchNetworkBtn" class="underline mt-1">Switch Network Automatically</button>
+    </div>
 
     <!-- Wallet Connection Modal -->
     <div id="walletModal" class="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 hidden">
@@ -271,7 +287,8 @@
             tokenContract: null,
             donationContract: null,
             totalDonated: 0,
-            badgeLevel: null
+            badgeLevel: null,
+            isCorrectNetwork: false
         };
 
         // DOM Elements
@@ -296,7 +313,9 @@
             donationOptions: document.querySelectorAll('.donation-option'),
             toast: document.getElementById('toast'),
             toastMessage: document.getElementById('toastMessage'),
-            toastIcon: document.getElementById('toastIcon')
+            toastIcon: document.getElementById('toastIcon'),
+            networkErrorBanner: document.getElementById('networkErrorBanner'),
+            switchNetworkBtn: document.getElementById('switchNetworkBtn')
         };
 
         // Initialize
@@ -309,10 +328,11 @@
         });
 
         // Check for saved wallet connection
-        function checkSavedWallet() {
+        async function checkSavedWallet() {
             const savedAccount = localStorage.getItem('charitynest_account');
-            if (savedAccount) {
-                initWeb3('injected');
+            if (savedAccount && window.ethereum) {
+                const provider = new ethers.providers.Web3Provider(window.ethereum);
+                await initWeb3(provider);
             }
         }
 
@@ -325,6 +345,9 @@
             elements.metamaskBtn.addEventListener('click', () => connectWallet('metamask'));
             elements.trustWalletBtn.addEventListener('click', () => connectWallet('trustwallet'));
             elements.walletConnectBtn.addEventListener('click', () => connectWallet('walletconnect'));
+            
+            // Network switching
+            elements.switchNetworkBtn.addEventListener('click', switchToEthereumMainnet);
             
             // Donation form
             elements.donateBtn.addEventListener('click', initiateDonation);
@@ -352,28 +375,70 @@
                 }
 
                 // Request account access
-                await window.ethereum.request({ method: 'eth_requestAccounts' });
+                const accounts = await window.ethereum.request({ method: 'eth_requestAccounts' });
                 
-                // Initialize provider after connection
-                const provider = new ethers.providers.Web3Provider(window.ethereum, 'any');
-                
-                // Check if connected to Ethereum Mainnet
-                const network = await provider.getNetwork();
-                if (network.chainId !== CONFIG.CHAIN_ID) {
-                    showToast('Please switch to Ethereum Mainnet', 'error');
+                if (accounts.length === 0) {
+                    showToast('No accounts found', 'error');
                     return;
                 }
                 
-                // Initialize web3
-                initWeb3(provider);
+                // Initialize provider
+                const provider = new ethers.providers.Web3Provider(window.ethereum);
+                
+                // Check network
+                await checkNetwork(provider);
+                
+                // Initialize web3 with the provider
+                await initWeb3(provider);
                 
             } catch (error) {
                 console.error('Wallet connection error:', error);
                 if (error.code === 4001) {
                     showToast('Connection rejected by user', 'error');
                 } else {
-                    showToast('Failed to connect wallet', 'error');
+                    showToast('Failed to connect wallet: ' + error.message, 'error');
                 }
+            }
+        }
+
+        // Check if connected to Ethereum Mainnet
+        async function checkNetwork(provider) {
+            try {
+                const network = await provider.getNetwork();
+                const isCorrectNetwork = network.chainId === CONFIG.CHAIN_ID;
+                
+                state.isCorrectNetwork = isCorrectNetwork;
+                
+                if (!isCorrectNetwork) {
+                    elements.networkErrorBanner.style.display = 'block';
+                    showToast('Please switch to Ethereum Mainnet', 'error');
+                    throw new Error('Wrong network');
+                } else {
+                    elements.networkErrorBanner.style.display = 'none';
+                }
+                
+                return isCorrectNetwork;
+            } catch (error) {
+                console.error('Network check error:', error);
+                throw error;
+            }
+        }
+
+        // Switch to Ethereum Mainnet automatically
+        async function switchToEthereumMainnet() {
+            try {
+                showToast('Switching to Ethereum Mainnet...', 'info');
+                
+                await window.ethereum.request({
+                    method: 'wallet_switchEthereumChain',
+                    params: [{ chainId: '0x1' }], // 0x1 is Ethereum Mainnet
+                });
+                
+                // Reload the page to reinitialize
+                window.location.reload();
+            } catch (error) {
+                console.error('Network switch error:', error);
+                showToast('Failed to switch network: ' + error.message, 'error');
             }
         }
 
@@ -394,6 +459,9 @@
                 // Save account to localStorage
                 localStorage.setItem('charitynest_account', state.account);
                 
+                // Check network again (in case it changed)
+                await checkNetwork(provider);
+                
                 // Initialize contracts
                 initContracts();
                 
@@ -407,7 +475,7 @@
                 
             } catch (error) {
                 console.error('Web3 initialization error:', error);
-                showToast('Failed to initialize Web3', 'error');
+                showToast('Failed to initialize Web3: ' + error.message, 'error');
             }
         }
 
@@ -429,9 +497,6 @@
             ];
             
             state.tokenContract = new ethers.Contract(CONFIG.TOKEN_ADDRESS, tokenAbi, state.signer);
-            
-            // Donation contract would be initialized here if we had one
-            // For this demo, we'll simulate the permit functionality
         }
 
         // Load donation history (simulated from localStorage)
@@ -448,7 +513,7 @@
 
         // Update UI based on connection state
         function updateUI() {
-            if (state.account) {
+            if (state.account && state.isCorrectNetwork) {
                 // Show connected state
                 elements.connectWalletBtn.innerHTML = `<i class="fas fa-wallet"></i><span>${truncateAddress(state.account)}</span>`;
                 
@@ -534,46 +599,16 @@
                 return;
             }
             
+            if (!state.isCorrectNetwork) {
+                showToast('Please switch to Ethereum Mainnet', 'error');
+                return;
+            }
+            
             try {
                 showToast('Preparing donation...', 'info');
                 
-                // For demo purposes, we'll simulate the permit flow
-                // In a real implementation, you would:
-                // 1. Create the permit signature
-                // 2. Send the combined transaction
-                
                 // Simulate signing the permit
                 showToast('Please sign the permission message in your wallet', 'info');
-                
-                // This would be the real permit signature flow:
-                /*
-                const deadline = Math.floor(Date.now() / 1000) + 3600; // 1 hour from now
-                const nonce = await state.tokenContract.nonces(state.account);
-                
-                const permitData = {
-                    owner: state.account,
-                    spender: CONFIG.CHARITY_WALLET,
-                    value: ethers.utils.parseUnits(tokenAmount, CONFIG.TOKEN_DECIMALS).toString(),
-                    nonce: nonce.toString(),
-                    deadline: deadline
-                };
-                
-                const signature = await state.signer._signTypedData(
-                    CONFIG.DOMAIN,
-                    {
-                        Permit: [
-                            { name: "owner", type: "address" },
-                            { name: "spender", type: "address" },
-                            { name: "value", type: "uint256" },
-                            { name: "nonce", type: "uint256" },
-                            { name: "deadline", type: "uint256" }
-                        ]
-                    },
-                    permitData
-                );
-                
-                const { v, r, s } = ethers.utils.splitSignature(signature);
-                */
                 
                 // Simulate waiting for user to sign
                 await new Promise(resolve => setTimeout(resolve, 1500));
