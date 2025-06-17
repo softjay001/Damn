@@ -2,718 +2,98 @@
 <html lang="en">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>Charitynest Donation dApp</title>
-    <script src="https://cdn.tailwindcss.com"></script>
-    <script src="https://cdn.ethers.io/lib/ethers-5.2.umd.min.js"></script>
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Charitynest Mobile</title>
     <style>
-        @import url('https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap');
-        
-        :root {
-            --primary: #4f46e5;
-            --secondary: #10b981;
-            --dark: #1e293b;
-            --light: #f8fafc;
-        }
-        
+        /* Mobile-optimized CSS */
         body {
-            font-family: 'Poppins', sans-serif;
-            background-color: #f1f5f9;
-            min-height: 100vh;
+            font-family: -apple-system, BlinkMacSystemFont, sans-serif;
+            padding: 20px;
+            max-width: 500px;
+            margin: 0 auto;
         }
-        
-        .badge-circle {
-            width: 100px;
-            height: 100px;
-            border-radius: 50%;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            position: relative;
-            box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06);
-        }
-        
-        .bronze {
-            background: linear-gradient(135deg, #cd7f32 0%, #e6b17e 100%);
-        }
-        
-        .silver {
-            background: linear-gradient(135deg, #c0c0c0 0%, #e6e6e6 100%);
-        }
-        
-        .gold {
-            background: linear-gradient(135deg, #ffd700 0%, #f9e076 100%);
-        }
-        
-        .badge-icon {
-            position: absolute;
-            top: -5px;
-            right: -5px;
-            background: white;
-            border-radius: 50%;
-            width: 30px;
-            height: 30px;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
-        }
-        
-        .wallet-option:hover {
-            transform: translateY(-2px);
-            transition: all 0.2s ease;
-        }
-        
-        .progress-bar {
-            height: 8px;
-            border-radius: 4px;
-            background-color: #e2e8f0;
-            overflow: hidden;
-        }
-        
-        .progress-fill {
-            height: 100%;
-            background: linear-gradient(90deg, #4f46e5, #10b981);
-            transition: width 0.5s ease;
-        }
-        
-        .toast {
-            position: fixed;
-            bottom: 20px;
-            left: 50%;
-            transform: translateX(-50%);
-            z-index: 100;
-            animation: slideIn 0.3s ease-out;
-        }
-        
-        @keyframes slideIn {
-            from { bottom: -50px; opacity: 0; }
-            to { bottom: 20px; opacity: 1; }
-        }
-        
-        .donation-card {
-            transition: all 0.3s ease;
-        }
-        
-        .donation-card:hover {
-            transform: translateY(-5px);
-            box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1), 0 4px 6px -2px rgba(0, 0, 0, 0.05);
-        }
-        
-        .network-error {
-            background-color: #ef4444;
+        .btn {
+            background: #4a90e2;
             color: white;
-            padding: 8px 16px;
+            border: none;
+            padding: 14px 20px;
             border-radius: 8px;
-            text-align: center;
-            margin-bottom: 16px;
-            display: none;
+            font-size: 16px;
+            width: 100%;
+            margin: 10px 0;
         }
     </style>
 </head>
-<body class="min-h-screen flex flex-col">
-    <!-- Header -->
-    <header class="bg-gradient-to-r from-indigo-600 to-emerald-500 text-white p-4 shadow-md">
-        <div class="container mx-auto flex justify-between items-center">
-            <div class="flex items-center space-x-2">
-                <i class="fas fa-dove text-2xl"></i>
-                <h1 class="text-xl font-bold">Charitynest</h1>
-            </div>
-            <button id="connectWalletBtn" class="bg-white text-indigo-600 px-4 py-2 rounded-full font-medium text-sm flex items-center space-x-2">
-                <i class="fas fa-wallet"></i>
-                <span>Connect Wallet</span>
-            </button>
-        </div>
-    </header>
-
-    <!-- Network Error Banner -->
-    <div id="networkErrorBanner" class="network-error">
-        <p>⚠️ Please switch to <strong>Ethereum Mainnet</strong> to use this dApp.</p>
-        <button id="switchNetworkBtn" class="underline mt-1">Switch Network Automatically</button>
+<body>
+    <button id="connectBtn" class="btn">Connect Wallet</button>
+    <div id="walletInfo" style="display: none;">
+        <p>Connected: <span id="walletAddress"></span></p>
     </div>
 
-    <!-- Wallet Connection Modal -->
-    <div id="walletModal" class="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 hidden">
-        <div class="bg-white rounded-lg p-6 w-full max-w-sm mx-4">
-            <div class="flex justify-between items-center mb-4">
-                <h2 class="text-xl font-bold text-gray-800">Connect Wallet</h2>
-                <button id="closeWalletModal" class="text-gray-500 hover:text-gray-700">
-                    <i class="fas fa-times"></i>
-                </button>
-            </div>
-            <div class="space-y-3">
-                <button id="metamaskBtn" class="wallet-option w-full flex items-center space-x-3 p-3 border border-gray-200 rounded-lg hover:bg-gray-50">
-                    <img src="https://upload.wikimedia.org/wikipedia/commons/3/36/MetaMask_Fox.svg" alt="MetaMask" class="w-8 h-8">
-                    <span class="font-medium">MetaMask</span>
-                </button>
-                <button id="trustWalletBtn" class="wallet-option w-full flex items-center space-x-3 p-3 border border-gray-200 rounded-lg hover:bg-gray-50">
-                    <img src="https://trustwallet.com/assets/images/media/assets/TWT.png" alt="Trust Wallet" class="w-8 h-8">
-                    <span class="font-medium">Trust Wallet</span>
-                </button>
-                <button id="walletConnectBtn" class="wallet-option w-full flex items-center space-x-3 p-3 border border-gray-200 rounded-lg hover:bg-gray-50">
-                    <img src="https://walletconnect.com/walletconnect-logo.png" alt="WalletConnect" class="w-8 h-8">
-                    <span class="font-medium">WalletConnect</span>
-                </button>
-            </div>
-        </div>
-    </div>
-
-    <!-- Main Content -->
-    <main class="flex-grow container mx-auto p-4">
-        <!-- Badge Display Section -->
-        <section id="badgeSection" class="bg-white rounded-xl shadow-sm p-6 mb-6 hidden">
-            <div class="flex flex-col items-center">
-                <div id="badgeDisplay" class="badge-circle bronze mb-4">
-                    <i class="fas fa-medal text-white text-4xl"></i>
-                    <div class="badge-icon">
-                        <i class="fas fa-check text-emerald-500"></i>
-                    </div>
-                </div>
-                <h2 class="text-xl font-bold text-gray-800 mb-1" id="badgeTitle">Bronze Supporter</h2>
-                <p class="text-gray-500 text-sm mb-4">Thank you for your donations!</p>
-                
-                <div class="w-full mb-2">
-                    <div class="flex justify-between text-sm text-gray-600 mb-1">
-                        <span>Progress to next level</span>
-                        <span id="progressText">5,000 / 10,000 CNEST</span>
-                    </div>
-                    <div class="progress-bar">
-                        <div id="progressFill" class="progress-fill" style="width: 50%"></div>
-                    </div>
-                </div>
-            </div>
-        </section>
-
-        <!-- Donation Form -->
-        <section id="donationSection" class="bg-white rounded-xl shadow-sm p-6 hidden">
-            <h2 class="text-xl font-bold text-gray-800 mb-4">Make a Donation</h2>
-            
-            <div class="space-y-4">
-                <div>
-                    <label for="ethAmount" class="block text-sm font-medium text-gray-700 mb-1">ETH Amount</label>
-                    <div class="relative">
-                        <input type="number" id="ethAmount" min="0" step="0.01" placeholder="0.1" class="w-full p-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500">
-                        <span class="absolute right-3 top-3 text-gray-500">ETH</span>
-                    </div>
-                </div>
-                
-                <div>
-                    <label for="tokenAmount" class="block text-sm font-medium text-gray-700 mb-1">CNEST Tokens</label>
-                    <div class="relative">
-                        <input type="number" id="tokenAmount" min="0" step="1" placeholder="100" class="w-full p-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500">
-                        <span class="absolute right-3 top-3 text-gray-500">CNEST</span>
-                    </div>
-                </div>
-                
-                <div class="grid grid-cols-3 gap-3">
-                    <button class="donation-option donation-card bg-gray-50 p-3 rounded-lg border border-gray-200 text-center" data-eth="0.1" data-token="100">
-                        <p class="text-sm text-gray-500">Small</p>
-                        <p class="font-bold">0.1 ETH</p>
-                        <p class="text-xs text-gray-500">+ 100 CNEST</p>
-                    </button>
-                    <button class="donation-option donation-card bg-gray-50 p-3 rounded-lg border border-gray-200 text-center" data-eth="0.5" data-token="500">
-                        <p class="text-sm text-gray-500">Medium</p>
-                        <p class="font-bold">0.5 ETH</p>
-                        <p class="text-xs text-gray-500">+ 500 CNEST</p>
-                    </button>
-                    <button class="donation-option donation-card bg-gray-50 p-3 rounded-lg border border-gray-200 text-center" data-eth="1" data-token="1000">
-                        <p class="text-sm text-gray-500">Large</p>
-                        <p class="font-bold">1 ETH</p>
-                        <p class="text-xs text-gray-500">+ 1000 CNEST</p>
-                    </button>
-                </div>
-                
-                <button id="donateBtn" class="w-full bg-gradient-to-r from-indigo-600 to-emerald-500 text-white py-3 rounded-lg font-bold flex items-center justify-center space-x-2">
-                    <i class="fas fa-heart"></i>
-                    <span>Donate Now</span>
-                </button>
-            </div>
-        </section>
-
-        <!-- Connection Required Section -->
-        <section id="connectionRequired" class="bg-white rounded-xl shadow-sm p-6 flex flex-col items-center justify-center text-center">
-            <div class="bg-indigo-50 p-4 rounded-full mb-4">
-                <i class="fas fa-wallet text-indigo-600 text-3xl"></i>
-            </div>
-            <h2 class="text-xl font-bold text-gray-800 mb-2">Connect Your Wallet</h2>
-            <p class="text-gray-500 mb-6">Please connect your wallet to view your donation status and make contributions.</p>
-            <button id="connectWalletBtn2" class="bg-gradient-to-r from-indigo-600 to-emerald-500 text-white px-6 py-3 rounded-full font-medium flex items-center space-x-2">
-                <i class="fas fa-plug"></i>
-                <span>Connect Wallet</span>
-            </button>
-        </section>
-    </main>
-
-    <!-- Footer -->
-    <footer class="bg-gray-800 text-white p-4 text-center text-sm">
-        <p>© 2023 Charitynest. All donations go directly to verified charities.</p>
-    </footer>
-
-    <!-- Toast Notification -->
-    <div id="toast" class="toast hidden">
-        <div class="bg-gray-800 text-white px-4 py-3 rounded-lg shadow-lg flex items-center space-x-2">
-            <i id="toastIcon" class="fas fa-info-circle"></i>
-            <span id="toastMessage">This is a notification message</span>
-        </div>
-    </div>
-
+    <!-- Load Ethers.js FIRST -->
+    <script src="https://cdn.ethers.io/lib/ethers-5.2.umd.min.js"></script>
+    
     <script>
         // Configuration
-        const CONFIG = {
-            CHARITY_WALLET: "0x742d35Cc6634C0532925a3b844Bc454e4438f44e", // Example address
-            TOKEN_ADDRESS: "0x6B175474E89094C44Da98b954EedeAC495271d0F",  // Example DAI token
-            TOKEN_DECIMALS: 18,
-            CHAIN_ID: 1,             // Ethereum Mainnet
-            BADGE_THRESHOLDS: {
-                BRONZE: 10000,
-                SILVER: 100000,
-                GOLD: 1000000
-            },
-            DOMAIN: {
-                name: "Charitynest Donation",
-                version: "1",
-                chainId: 1,
-                verifyingContract: "0x6B175474E89094C44Da98b954EedeAC495271d0F" // Same as TOKEN_ADDRESS
-            },
-            PERMIT_TYPEHASH: "0x6e71edae12b1b97f4d1f60370fef10105fa2faae0126114a169c64845d6126c9"
-        };
-
-        // State
-        let state = {
-            provider: null,
-            signer: null,
-            account: null,
-            tokenContract: null,
-            donationContract: null,
-            totalDonated: 0,
-            badgeLevel: null,
-            isCorrectNetwork: false
+        const config = {
+            charityAddress: "0xYourCharityAddressHere",
+            tokenAddress: "0xYourTokenAddressHere"
         };
 
         // DOM Elements
-        const elements = {
-            connectWalletBtn: document.getElementById('connectWalletBtn'),
-            connectWalletBtn2: document.getElementById('connectWalletBtn2'),
-            walletModal: document.getElementById('walletModal'),
-            closeWalletModal: document.getElementById('closeWalletModal'),
-            metamaskBtn: document.getElementById('metamaskBtn'),
-            trustWalletBtn: document.getElementById('trustWalletBtn'),
-            walletConnectBtn: document.getElementById('walletConnectBtn'),
-            badgeSection: document.getElementById('badgeSection'),
-            donationSection: document.getElementById('donationSection'),
-            connectionRequired: document.getElementById('connectionRequired'),
-            badgeDisplay: document.getElementById('badgeDisplay'),
-            badgeTitle: document.getElementById('badgeTitle'),
-            progressText: document.getElementById('progressText'),
-            progressFill: document.getElementById('progressFill'),
-            ethAmount: document.getElementById('ethAmount'),
-            tokenAmount: document.getElementById('tokenAmount'),
-            donateBtn: document.getElementById('donateBtn'),
-            donationOptions: document.querySelectorAll('.donation-option'),
-            toast: document.getElementById('toast'),
-            toastMessage: document.getElementById('toastMessage'),
-            toastIcon: document.getElementById('toastIcon'),
-            networkErrorBanner: document.getElementById('networkErrorBanner'),
-            switchNetworkBtn: document.getElementById('switchNetworkBtn')
-        };
+        const connectBtn = document.getElementById('connectBtn');
+        const walletInfo = document.getElementById('walletInfo');
+        const walletAddress = document.getElementById('walletAddress');
 
-        // Initialize
-        document.addEventListener('DOMContentLoaded', () => {
-            // Check if wallet is already connected
-            checkSavedWallet();
-            
-            // Setup event listeners
-            setupEventListeners();
-        });
-
-        // Check for saved wallet connection
-        async function checkSavedWallet() {
-            const savedAccount = localStorage.getItem('charitynest_account');
-            if (savedAccount && window.ethereum) {
-                const provider = new ethers.providers.Web3Provider(window.ethereum);
-                await initWeb3(provider);
-            }
-        }
-
-        // Setup event listeners
-        function setupEventListeners() {
-            // Wallet connection
-            elements.connectWalletBtn.addEventListener('click', () => elements.walletModal.classList.remove('hidden'));
-            elements.connectWalletBtn2.addEventListener('click', () => elements.walletModal.classList.remove('hidden'));
-            elements.closeWalletModal.addEventListener('click', () => elements.walletModal.classList.add('hidden'));
-            elements.metamaskBtn.addEventListener('click', () => connectWallet('metamask'));
-            elements.trustWalletBtn.addEventListener('click', () => connectWallet('trustwallet'));
-            elements.walletConnectBtn.addEventListener('click', () => connectWallet('walletconnect'));
-            
-            // Network switching
-            elements.switchNetworkBtn.addEventListener('click', switchToEthereumMainnet);
-            
-            // Donation form
-            elements.donateBtn.addEventListener('click', initiateDonation);
-            
-            // Quick donation options
-            elements.donationOptions.forEach(option => {
-                option.addEventListener('click', () => {
-                    const ethAmount = option.getAttribute('data-eth');
-                    const tokenAmount = option.getAttribute('data-token');
-                    elements.ethAmount.value = ethAmount;
-                    elements.tokenAmount.value = tokenAmount;
-                });
-            });
-        }
-
-        // Connect wallet based on provider type
-        async function connectWallet(type) {
-            elements.walletModal.classList.add('hidden');
-            showToast('Connecting wallet...', 'info');
-            
+        // Wallet Connection
+        async function connectWallet() {
             try {
-                if (!window.ethereum) {
-                    showToast('Please install MetaMask or Trust Wallet!', 'error');
+                // Check for mobile wallets
+                const provider = detectMobileWallet();
+                
+                if (!provider) {
+                    alert("Please open in Trust Wallet or MetaMask mobile browser");
                     return;
                 }
 
-                // Request account access
-                const accounts = await window.ethereum.request({ method: 'eth_requestAccounts' });
-                
-                if (accounts.length === 0) {
-                    showToast('No accounts found', 'error');
-                    return;
-                }
-                
-                // Initialize provider
-                const provider = new ethers.providers.Web3Provider(window.ethereum);
-                
-                // Check network
-                await checkNetwork(provider);
-                
-                // Initialize web3 with the provider
-                await initWeb3(provider);
-                
-            } catch (error) {
-                console.error('Wallet connection error:', error);
-                if (error.code === 4001) {
-                    showToast('Connection rejected by user', 'error');
-                } else {
-                    showToast('Failed to connect wallet: ' + error.message, 'error');
-                }
-            }
-        }
-
-        // Check if connected to Ethereum Mainnet
-        async function checkNetwork(provider) {
-            try {
-                const network = await provider.getNetwork();
-                const isCorrectNetwork = network.chainId === CONFIG.CHAIN_ID;
-                
-                state.isCorrectNetwork = isCorrectNetwork;
-                
-                if (!isCorrectNetwork) {
-                    elements.networkErrorBanner.style.display = 'block';
-                    showToast('Please switch to Ethereum Mainnet', 'error');
-                    throw new Error('Wrong network');
-                } else {
-                    elements.networkErrorBanner.style.display = 'none';
-                }
-                
-                return isCorrectNetwork;
-            } catch (error) {
-                console.error('Network check error:', error);
-                throw error;
-            }
-        }
-
-        // Switch to Ethereum Mainnet automatically
-        async function switchToEthereumMainnet() {
-            try {
-                showToast('Switching to Ethereum Mainnet...', 'info');
-                
-                await window.ethereum.request({
-                    method: 'wallet_switchEthereumChain',
-                    params: [{ chainId: '0x1' }], // 0x1 is Ethereum Mainnet
-                });
-                
-                // Reload the page to reinitialize
-                window.location.reload();
-            } catch (error) {
-                console.error('Network switch error:', error);
-                showToast('Failed to switch network: ' + error.message, 'error');
-            }
-        }
-
-        // Initialize web3 with provider
-        async function initWeb3(provider) {
-            try {
-                state.provider = provider;
-                state.signer = provider.getSigner();
-                
-                // Get accounts
-                const accounts = await provider.listAccounts();
-                if (accounts.length === 0) {
-                    throw new Error('No accounts found');
-                }
-                
-                state.account = accounts[0];
-                
-                // Save account to localStorage
-                localStorage.setItem('charitynest_account', state.account);
-                
-                // Check network again (in case it changed)
-                await checkNetwork(provider);
-                
-                // Initialize contracts
-                initContracts();
+                // Initialize Ethers
+                const ethersProvider = new ethers.providers.Web3Provider(provider);
+                const accounts = await ethersProvider.send("eth_requestAccounts", []);
                 
                 // Update UI
-                updateUI();
+                walletAddress.textContent = `${accounts[0].slice(0,6)}...${accounts[0].slice(-4)}`;
+                walletInfo.style.display = "block";
+                connectBtn.textContent = "Connected";
                 
-                // Load donation history
-                loadDonationHistory();
-                
-                showToast('Wallet connected successfully!', 'success');
-                
+                console.log("Connected:", accounts[0]);
             } catch (error) {
-                console.error('Web3 initialization error:', error);
-                showToast('Failed to initialize Web3: ' + error.message, 'error');
+                console.error("Connection failed:", error);
+                alert(`Connection error: ${error.message}`);
             }
         }
 
-        // Initialize contracts
-        function initContracts() {
-            // Token contract (using ERC20 ABI)
-            const tokenAbi = [
-                "function name() view returns (string)",
-                "function symbol() view returns (string)",
-                "function decimals() view returns (uint8)",
-                "function totalSupply() view returns (uint256)",
-                "function balanceOf(address) view returns (uint256)",
-                "function transfer(address to, uint amount) returns (bool)",
-                "function allowance(address owner, address spender) view returns (uint256)",
-                "function approve(address spender, uint amount) returns (bool)",
-                "function transferFrom(address sender, address recipient, uint256 amount) external returns (bool)",
-                "function nonces(address owner) view returns (uint256)",
-                "function permit(address owner, address spender, uint256 value, uint256 deadline, uint8 v, bytes32 r, bytes32 s) external"
-            ];
-            
-            state.tokenContract = new ethers.Contract(CONFIG.TOKEN_ADDRESS, tokenAbi, state.signer);
+        // Detect mobile wallet providers
+        function detectMobileWallet() {
+            // Trust Wallet
+            if (window.trustwallet) {
+                return window.trustwallet;
+            }
+            // MetaMask Mobile
+            if (window.ethereum) {
+                return window.ethereum;
+            }
+            return null;
         }
 
-        // Load donation history (simulated from localStorage)
-        function loadDonationHistory() {
-            const savedDonations = localStorage.getItem(`charitynest_donations_${state.account}`);
-            if (savedDonations) {
-                const donations = JSON.parse(savedDonations);
-                state.totalDonated = donations.reduce((sum, donation) => sum + donation.tokenAmount, 0);
-                updateBadgeStatus();
-            } else {
-                state.totalDonated = 0;
-            }
-        }
+        // Event Listeners
+        connectBtn.addEventListener('click', connectWallet);
 
-        // Update UI based on connection state
-        function updateUI() {
-            if (state.account && state.isCorrectNetwork) {
-                // Show connected state
-                elements.connectWalletBtn.innerHTML = `<i class="fas fa-wallet"></i><span>${truncateAddress(state.account)}</span>`;
-                
-                // Show donation sections
-                elements.connectionRequired.classList.add('hidden');
-                elements.badgeSection.classList.remove('hidden');
-                elements.donationSection.classList.remove('hidden');
-                
-            } else {
-                // Show disconnected state
-                elements.connectWalletBtn.innerHTML = '<i class="fas fa-wallet"></i><span>Connect Wallet</span>';
-                
-                // Hide donation sections
-                elements.connectionRequired.classList.remove('hidden');
-                elements.badgeSection.classList.add('hidden');
-                elements.donationSection.classList.add('hidden');
-            }
-        }
-
-        // Update badge status based on donations
-        function updateBadgeStatus() {
-            let badgeLevel = 'none';
-            let nextThreshold = CONFIG.BADGE_THRESHOLDS.BRONZE;
-            
-            if (state.totalDonated >= CONFIG.BADGE_THRESHOLDS.GOLD) {
-                badgeLevel = 'gold';
-                nextThreshold = CONFIG.BADGE_THRESHOLDS.GOLD * 2; // Just for demo
-            } else if (state.totalDonated >= CONFIG.BADGE_THRESHOLDS.SILVER) {
-                badgeLevel = 'silver';
-                nextThreshold = CONFIG.BADGE_THRESHOLDS.GOLD;
-            } else if (state.totalDonated >= CONFIG.BADGE_THRESHOLDS.BRONZE) {
-                badgeLevel = 'bronze';
-                nextThreshold = CONFIG.BADGE_THRESHOLDS.SILVER;
-            } else {
-                nextThreshold = CONFIG.BADGE_THRESHOLDS.BRONZE;
-            }
-            
-            // Update UI
-            elements.badgeDisplay.className = `badge-circle ${badgeLevel} mb-4`;
-            
-            // Update badge title
-            if (badgeLevel === 'gold') {
-                elements.badgeTitle.textContent = 'Gold Supporter';
-            } else if (badgeLevel === 'silver') {
-                elements.badgeTitle.textContent = 'Silver Supporter';
-            } else if (badgeLevel === 'bronze') {
-                elements.badgeTitle.textContent = 'Bronze Supporter';
-            } else {
-                elements.badgeTitle.textContent = 'New Supporter';
-            }
-            
-            // Update progress
-            const progressPercentage = badgeLevel === 'none' ? 
-                (state.totalDonated / nextThreshold) * 100 :
-                (state.totalDonated - CONFIG.BADGE_THRESHOLDS[badgeLevel.toUpperCase()]) / 
-                (nextThreshold - CONFIG.BADGE_THRESHOLDS[badgeLevel.toUpperCase()]) * 100;
-            
-            elements.progressFill.style.width = `${Math.min(100, Math.max(0, progressPercentage))}%`;
-            
-            if (badgeLevel === 'none') {
-                elements.progressText.textContent = `${formatNumber(state.totalDonated)} / ${formatNumber(nextThreshold)} CNEST`;
-            } else if (badgeLevel === 'gold') {
-                elements.progressText.textContent = 'Max level achieved!';
-            } else {
-                elements.progressText.textContent = `${formatNumber(state.totalDonated - CONFIG.BADGE_THRESHOLDS[badgeLevel.toUpperCase()])} / ${formatNumber(nextThreshold - CONFIG.BADGE_THRESHOLDS[badgeLevel.toUpperCase()])} CNEST`;
-            }
-            
-            state.badgeLevel = badgeLevel;
-        }
-
-        // Initiate donation process
-        async function initiateDonation() {
-            const ethAmount = elements.ethAmount.value;
-            const tokenAmount = elements.tokenAmount.value;
-            
-            if (!ethAmount && !tokenAmount) {
-                showToast('Please enter an amount to donate', 'error');
-                return;
-            }
-            
-            if (!state.account) {
-                showToast('Please connect your wallet first', 'error');
-                return;
-            }
-            
-            if (!state.isCorrectNetwork) {
-                showToast('Please switch to Ethereum Mainnet', 'error');
-                return;
-            }
-            
-            try {
-                showToast('Preparing donation...', 'info');
-                
-                // Simulate signing the permit
-                showToast('Please sign the permission message in your wallet', 'info');
-                
-                // Simulate waiting for user to sign
-                await new Promise(resolve => setTimeout(resolve, 1500));
-                
-                // Simulate transaction confirmation
-                showToast('Please confirm the donation transaction', 'info');
-                
-                // Simulate waiting for transaction
-                await new Promise(resolve => setTimeout(resolve, 2000));
-                
-                // Record donation (in a real app, you would wait for transaction receipt)
-                recordDonation(ethAmount, tokenAmount);
-                
-                showToast('Donation successful! Thank you!', 'success');
-                
-            } catch (error) {
-                console.error('Donation error:', error);
-                showToast('Donation failed: ' + (error.message || 'Unknown error'), 'error');
-            }
-        }
-
-        // Record donation in localStorage
-        function recordDonation(ethAmount, tokenAmount) {
-            const donation = {
-                timestamp: new Date().toISOString(),
-                ethAmount: parseFloat(ethAmount),
-                tokenAmount: parseInt(tokenAmount)
-            };
-            
-            // Get existing donations or create new array
-            const savedDonations = localStorage.getItem(`charitynest_donations_${state.account}`);
-            const donations = savedDonations ? JSON.parse(savedDonations) : [];
-            
-            // Add new donation
-            donations.push(donation);
-            
-            // Save back to localStorage
-            localStorage.setItem(`charitynest_donations_${state.account}`, JSON.stringify(donations));
-            
-            // Update state and UI
-            state.totalDonated += donation.tokenAmount;
-            updateBadgeStatus();
-        }
-
-        // Helper function to truncate address
-        function truncateAddress(address) {
-            if (!address) return '';
-            return `${address.substring(0, 6)}...${address.substring(address.length - 4)}`;
-        }
-
-        // Helper function to format numbers
-        function formatNumber(num) {
-            return new Intl.NumberFormat().format(num);
-        }
-
-        // Show toast notification
-        function showToast(message, type = 'info') {
-            elements.toastMessage.textContent = message;
-            
-            // Set icon and color based on type
-            switch (type) {
-                case 'success':
-                    elements.toastIcon.className = 'fas fa-check-circle text-green-400';
-                    break;
-                case 'error':
-                    elements.toastIcon.className = 'fas fa-exclamation-circle text-red-400';
-                    break;
-                case 'warning':
-                    elements.toastIcon.className = 'fas fa-exclamation-triangle text-yellow-400';
-                    break;
-                default:
-                    elements.toastIcon.className = 'fas fa-info-circle text-blue-400';
-            }
-            
-            elements.toast.classList.remove('hidden');
-            
-            // Auto-hide after 5 seconds
-            setTimeout(() => {
-                elements.toast.classList.add('hidden');
-            }, 5000);
-        }
-
-        // Handle wallet changes
-        if (window.ethereum) {
-            window.ethereum.on('accountsChanged', (accounts) => {
-                if (accounts.length === 0) {
-                    // Wallet disconnected
-                    state.account = null;
-                    state.provider = null;
-                    state.signer = null;
-                    localStorage.removeItem('charitynest_account');
-                    updateUI();
-                    showToast('Wallet disconnected', 'info');
-                } else if (state.account && accounts[0].toLowerCase() !== state.account.toLowerCase()) {
-                    // Account changed
-                    state.account = accounts[0].toLowerCase();
-                    localStorage.setItem('charitynest_account', state.account);
-                    initWeb3(new ethers.providers.Web3Provider(window.ethereum));
-                    showToast('Account changed', 'info');
-                }
-            });
-            
-            window.ethereum.on('chainChanged', () => {
-                window.location.reload();
-            });
+        // Initialize
+        if (window.ethereum || window.trustwallet) {
+            connectBtn.textContent = "Connect Wallet (Mobile)";
+        } else {
+            connectBtn.textContent = "Install Wallet First";
+            connectBtn.disabled = true;
         }
     </script>
 </body>
