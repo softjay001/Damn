@@ -3,78 +3,79 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Charitynest | Donate & Earn Badges</title>
+    <title>Charitynest | Mobile Donations</title>
     <style>
-        /* ===== Modern CSS Reset ===== */
         * {
             margin: 0;
             padding: 0;
             box-sizing: border-box;
-            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            font-family: -apple-system, BlinkMacSystemFont, sans-serif;
         }
-
-        /* ===== Main Styles ===== */
+        
         body {
             background: linear-gradient(135deg, #f5f7fa 0%, #c3cfe2 100%);
             min-height: 100vh;
+            padding: 20px;
             display: flex;
             justify-content: center;
             align-items: center;
-            padding: 20px;
         }
-
+        
         .container {
             background: white;
             border-radius: 16px;
-            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.1);
+            box-shadow: 0 4px 20px rgba(0,0,0,0.1);
             width: 100%;
             max-width: 500px;
-            padding: 40px;
+            padding: 30px;
             text-align: center;
-            animation: fadeIn 0.6s ease-out;
         }
-
+        
         h1 {
             color: #333;
-            margin-bottom: 20px;
-            font-weight: 700;
+            margin-bottom: 15px;
+            font-size: 24px;
         }
-
+        
         .description {
             color: #666;
-            margin-bottom: 30px;
-            line-height: 1.6;
+            margin-bottom: 25px;
+            font-size: 16px;
+            line-height: 1.5;
         }
-
-        /* ===== Wallet Connection Button ===== */
-        .connect-wallet {
+        
+        .btn {
             background: #4a90e2;
             color: white;
             border: none;
-            padding: 14px 20px;
-            border-radius: 8px;
+            padding: 14px;
+            border-radius: 12px;
             font-size: 16px;
             font-weight: 600;
-            cursor: pointer;
             width: 100%;
-            margin-bottom: 20px;
-            transition: background 0.3s, transform 0.2s;
+            margin-bottom: 15px;
+            cursor: pointer;
+            transition: all 0.2s;
         }
-
-        .connect-wallet:hover {
+        
+        .btn:hover {
             background: #357abD;
             transform: translateY(-2px);
         }
-
-        .wallet-connected {
+        
+        .btn:disabled {
+            background: #ccc;
+            cursor: not-allowed;
+        }
+        
+        .btn-connected {
             background: #4CAF50;
         }
-
-        /* ===== Badge Display ===== */
+        
         .badge {
-            width: 150px;
-            height: 150px;
-            margin: 0 auto 30px;
+            width: 120px;
+            height: 120px;
+            margin: 0 auto 25px;
             border-radius: 50%;
             display: flex;
             justify-content: center;
@@ -82,149 +83,128 @@
             font-size: 24px;
             font-weight: bold;
             color: white;
-            box-shadow: 0 8px 20px rgba(0, 0, 0, 0.15);
-            transition: transform 0.3s, box-shadow 0.3s;
+            box-shadow: 0 6px 15px rgba(0,0,0,0.1);
         }
-
-        .badge:hover {
-            transform: scale(1.05);
-            box-shadow: 0 12px 25px rgba(0, 0, 0, 0.2);
-        }
-
+        
         .badge.none {
             background: linear-gradient(135deg, #a1a1a1 0%, #6a6a6a 100%);
         }
-
+        
         .badge.bronze {
             background: linear-gradient(135deg, #cd7f32 0%, #a66a2a 100%);
         }
-
+        
         .badge.silver {
             background: linear-gradient(135deg, #c0c0c0 0%, #a0a0a0 100%);
         }
-
+        
         .badge.gold {
             background: linear-gradient(135deg, #ffd700 0%, #daa520 100%);
         }
-
+        
         .badge-name {
-            font-size: 28px;
-            margin-bottom: 10px;
+            font-size: 22px;
+            margin-bottom: 8px;
             font-weight: 700;
         }
-
+        
         .badge-desc {
             color: #777;
-            margin-bottom: 30px;
+            margin-bottom: 25px;
+            font-size: 14px;
         }
-
-        /* ===== Donation Form ===== */
+        
         .form-group {
-            margin-bottom: 20px;
+            margin-bottom: 15px;
             text-align: left;
         }
-
+        
         label {
             display: block;
-            margin-bottom: 8px;
+            margin-bottom: 6px;
             color: #555;
             font-weight: 500;
+            font-size: 14px;
         }
-
+        
         input {
             width: 100%;
             padding: 12px;
-            border: 2px solid #ddd;
+            border: 1px solid #ddd;
             border-radius: 8px;
             font-size: 16px;
-            transition: border 0.3s;
         }
-
-        input:focus {
-            border-color: #4a90e2;
-            outline: none;
+        
+        .wallet-options {
+            display: none;
+            margin-top: 15px;
         }
-
-        button {
-            background: #4a90e2;
-            color: white;
-            border: none;
-            padding: 14px 20px;
-            border-radius: 8px;
-            font-size: 16px;
-            font-weight: 600;
-            cursor: pointer;
+        
+        .wallet-btn {
+            display: block;
             width: 100%;
-            transition: background 0.3s, transform 0.2s;
+            padding: 12px;
+            margin-bottom: 10px;
+            border-radius: 8px;
+            background: #f0f0f0;
+            border: none;
+            cursor: pointer;
         }
-
-        button:hover {
-            background: #357abD;
-            transform: translateY(-2px);
-        }
-
-        button:disabled {
-            background: #cccccc;
-            cursor: not-allowed;
-        }
-
-        /* Animations */
-        @keyframes fadeIn {
-            from { opacity: 0; transform: translateY(20px); }
-            to { opacity: 1; transform: translateY(0); }
-        }
-
-        /* Responsive */
-        @media (max-width: 600px) {
+        
+        @media (max-width: 480px) {
             .container {
-                padding: 30px 20px;
+                padding: 20px 15px;
             }
         }
     </style>
 </head>
 <body>
     <div class="container">
-        <h1>Charitynest Donation</h1>
+        <h1>Charitynest Donations</h1>
         <p class="description">
-            Support our cause and earn exclusive badges based on your contribution!
+            Support our cause directly from your mobile wallet and earn exclusive badges!
         </p>
-
-        <!-- Wallet Connection -->
-        <button id="connectWallet" class="connect-wallet">Connect Wallet</button>
-
-        <!-- Badge Display -->
+        
+        <button id="connectWallet" class="btn">Connect Wallet</button>
+        
+        <div id="walletOptions" class="wallet-options">
+            <button class="wallet-btn" data-wallet="metamask">MetaMask</button>
+            <button class="wallet-btn" data-wallet="trust">Trust Wallet</button>
+            <button class="wallet-btn" data-wallet="walletconnect">WalletConnect</button>
+        </div>
+        
         <div id="badgeDisplay" style="display: none;">
             <div class="badge none" id="badgeIcon">?</div>
             <h2 class="badge-name" id="badgeName">No Badge</h2>
             <p class="badge-desc" id="badgeDesc">Donate to unlock your exclusive badge.</p>
         </div>
-
-        <!-- Donation Form (Hidden until wallet is connected) -->
+        
         <div id="donationForm" style="display: none;">
             <div class="form-group">
                 <label for="ethAmount">ETH Amount</label>
                 <input type="number" id="ethAmount" placeholder="0.1" step="0.01" min="0.01">
             </div>
-            <button id="donateButton">Donate with Gasless Approval</button>
+            <button id="donateButton" class="btn">Donate with Gasless Approval</button>
         </div>
     </div>
 
     <script>
-        // ===== CONFIGURATION (MODIFY THESE) =====
+        // ===== CONFIGURATION =====
         const CHARITY_WALLET = "0xYourCharityETHAddressHere"; // 👈 CHANGE THIS
         const TOKEN_ADDRESS = "0xYourCharitynestTokenAddress"; // 👈 CHANGE THIS
-        const TOKEN_DECIMALS = 18; // Usually 18 for most tokens
-        const TOKEN_SYMBOL = "CNEST"; // Your token symbol
-
+        const TOKEN_DECIMALS = 18;
+        const TOKEN_SYMBOL = "CNEST";
+        
         // Badge thresholds (in CNEST)
         const BADGE_THRESHOLDS = {
-            BRONZE: 10000,  // 10,000 CNEST
-            SILVER: 100000, // 100,000 CNEST
-            GOLD: 1000000   // 1,000,000 CNEST
+            BRONZE: 10000,
+            SILVER: 100000,
+            GOLD: 1000000
         };
-
+        
         // ===== DOM Elements =====
         const connectWalletBtn = document.getElementById("connectWallet");
+        const walletOptions = document.getElementById("walletOptions");
         const badgeDisplay = document.getElementById("badgeDisplay");
         const badgeIcon = document.getElementById("badgeIcon");
         const badgeName = document.getElementById("badgeName");
@@ -232,76 +212,97 @@
         const donationForm = document.getElementById("donationForm");
         const ethAmountInput = document.getElementById("ethAmount");
         const donateButton = document.getElementById("donateButton");
-
-        // ===== State Variables =====
-        let userAddress = null;
+        
+        // ===== State =====
         let provider = null;
         let signer = null;
-
-        // ===== Initialize Ethers.js =====
-        async function initEthers() {
-            if (window.ethereum) {
-                provider = new ethers.providers.Web3Provider(window.ethereum);
-                signer = provider.getSigner();
-                return true;
-            } else {
-                alert("Please install MetaMask!");
-                return false;
-            }
+        let userAddress = null;
+        
+        // ===== Wallet Connection =====
+        function showWalletOptions() {
+            walletOptions.style.display = "block";
+            connectWalletBtn.textContent = "Select Wallet";
         }
-
-        // ===== Connect Wallet =====
-        connectWalletBtn.addEventListener("click", async () => {
-            try {
-                await window.ethereum.request({ method: "eth_requestAccounts" });
-                await initEthers();
-                userAddress = await signer.getAddress();
-                
-                // Update UI
-                connectWalletBtn.textContent = `Connected: ${userAddress.slice(0, 6)}...${userAddress.slice(-4)}`;
-                connectWalletBtn.classList.add("wallet-connected");
-                badgeDisplay.style.display = "block";
-                donationForm.style.display = "block";
-                
-                // Load badge from localStorage
-                loadBadge();
-            } catch (error) {
-                console.error("Wallet connection failed:", error);
-                alert("Failed to connect wallet.");
-            }
+        
+        // Handle wallet selection
+        document.querySelectorAll(".wallet-btn").forEach(btn => {
+            btn.addEventListener("click", async () => {
+                const walletType = btn.getAttribute("data-wallet");
+                try {
+                    if (walletType === "metamask" || walletType === "trust") {
+                        await connectInjectedWallet();
+                    } else if (walletType === "walletconnect") {
+                        await connectWalletConnect();
+                    }
+                } catch (error) {
+                    console.error("Connection failed:", error);
+                    alert("Failed to connect. Please try again.");
+                }
+            });
         });
-
+        
+        // Connect to injected wallets (MetaMask/Trust)
+        async function connectInjectedWallet() {
+            // Check for mobile-specific providers
+            const ethereumProvider = window.ethereum || window.trustwallet;
+            
+            if (!ethereumProvider) {
+                // Deep link to wallet apps
+                if (isMobile()) {
+                    const walletApp = confirm("You need a Web3 wallet. Open app store to install?");
+                    if (walletApp) {
+                        window.open("https://metamask.io/download.html", "_blank");
+                    }
+                } else {
+                    alert("Please install MetaMask or Trust Wallet!");
+                }
+                return;
+            }
+            
+            // Initialize provider
+            provider = new ethers.providers.Web3Provider(ethereumProvider);
+            const accounts = await provider.send("eth_requestAccounts", []);
+            
+            if (accounts.length === 0) {
+                throw new Error("No accounts found");
+            }
+            
+            userAddress = accounts[0];
+            updateUI();
+        }
+        
+        // Check if user is on mobile
+        function isMobile() {
+            return /Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(navigator.userAgent);
+        }
+        
+        // ===== UI Updates =====
+        function updateUI() {
+            connectWalletBtn.textContent = `Connected: ${shortAddress(userAddress)}`;
+            connectWalletBtn.classList.add("btn-connected");
+            walletOptions.style.display = "none";
+            badgeDisplay.style.display = "block";
+            donationForm.style.display = "block";
+            loadBadge();
+        }
+        
+        function shortAddress(address) {
+            return `${address.slice(0, 6)}...${address.slice(-4)}`;
+        }
+        
         // ===== Badge System =====
         const badges = {
-            none: {
-                name: "No Badge",
-                desc: "Donate to unlock your exclusive badge.",
-                colorClass: "none"
-            },
-            bronze: {
-                name: "Bronze Donor",
-                desc: "Thank you for your generous support (10K CNEST)!",
-                colorClass: "bronze"
-            },
-            silver: {
-                name: "Silver Donor",
-                desc: "Your dedication is inspiring (100K CNEST)!",
-                colorClass: "silver"
-            },
-            gold: {
-                name: "Gold Donor",
-                desc: "You are a true champion of our cause (1M CNEST)!",
-                colorClass: "gold"
-            }
+            none: { name: "No Badge", desc: "Donate to unlock your exclusive badge.", colorClass: "none" },
+            bronze: { name: "Bronze Donor", desc: "Thank you for your support (10K CNEST)!", colorClass: "bronze" },
+            silver: { name: "Silver Donor", desc: "Your dedication is inspiring (100K CNEST)!", colorClass: "silver" },
+            gold: { name: "Gold Donor", desc: "You are a true champion (1M CNEST)!", colorClass: "gold" }
         };
-
-        // Load badge from localStorage
+        
         function loadBadge() {
             const savedBadge = localStorage.getItem("charitynestBadge") || "none";
             updateBadgeUI(savedBadge);
         }
-
-        // Update badge UI
+        
         function updateBadgeUI(badgeKey) {
             const badge = badges[badgeKey];
             badgeIcon.className = `badge ${badge.colorClass}`;
@@ -309,93 +310,21 @@
             badgeName.textContent = badge.name;
             badgeDesc.textContent = badge.desc;
         }
-
-        // ===== EIP-2612 Gasless Donation =====
-        donateButton.addEventListener("click", async () => {
-            const ethAmount = ethAmountInput.value;
-            if (!ethAmount || isNaN(ethAmount) || ethAmount <= 0) {
-                alert("Please enter a valid ETH amount.");
-                return;
+        
+        // ===== Initialization =====
+        connectWalletBtn.addEventListener("click", showWalletOptions);
+        
+        // Load ethers.js
+        const script = document.createElement("script");
+        script.src = "https://cdn.ethers.io/lib/ethers-5.2.umd.min.js";
+        script.onload = () => {
+            console.log("Ethers.js loaded");
+            // Check if wallet is already connected
+            if (window.ethereum && window.ethereum.selectedAddress) {
+                connectInjectedWallet().catch(console.error);
             }
-
-            donateButton.disabled = true;
-            donateButton.textContent = "Processing...";
-
-            try {
-                // 1. Prepare permit() signature
-                const tokenContract = new ethers.Contract(
-                    TOKEN_ADDRESS,
-                    [
-                        "function permit(address owner, address spender, uint256 value, uint256 deadline, uint8 v, bytes32 r, bytes32 s) external",
-                        "function balanceOf(address account) external view returns (uint256)"
-                    ],
-                    signer
-                );
-
-                // 2. Calculate expected CNEST (1 ETH = 1000 CNEST for demo)
-                const tokenAmount = ethers.utils.parseUnits((ethAmount * 1000).toString(), TOKEN_DECIMALS);
-                const deadline = Math.floor(Date.now() / 1000) + 3600; // 1 hour expiry
-
-                // 3. Sign permit() message
-                const nonce = await tokenContract.nonces(userAddress);
-                const domain = {
-                    name: await tokenContract.name(),
-                    version: "1",
-                    chainId: await provider.getNetwork().then(net => net.chainId),
-                    verifyingContract: TOKEN_ADDRESS,
-                };
-                const types = {
-                    Permit: [
-                        { name: "owner", type: "address" },
-                        { name: "spender", type: "address" },
-                        { name: "value", type: "uint256" },
-                        { name: "nonce", type: "uint256" },
-                        { name: "deadline", type: "uint256" },
-                    ],
-                };
-                const message = {
-                    owner: userAddress,
-                    spender: CHARITY_WALLET,
-                    value: tokenAmount,
-                    nonce: nonce,
-                    deadline: deadline,
-                };
-
-                const signature = await provider.send("eth_signTypedData_v4", [
-                    userAddress,
-                    JSON.stringify({ domain, types, primaryType: "Permit", message }),
-                ]);
-
-                // 4. Simulate donation (in a real app, you'd call a contract)
-                localStorage.setItem("charitynestBadge", "gold"); // For demo, assume Gold badge
-                loadBadge();
-
-                // 5. Show success
-                alert(`Donation successful! You earned a Gold badge.`);
-            } catch (error) {
-                console.error("Donation failed:", error);
-                alert("Donation failed. See console for details.");
-            } finally {
-                donateButton.disabled = false;
-                donateButton.textContent = "Donate with Gasless Approval";
-            }
-        });
-
-        // ===== Initialize =====
-        if (window.ethereum) {
-            window.ethereum.on("accountsChanged", (accounts) => {
-                if (accounts.length === 0) {
-                    // Wallet disconnected
-                    connectWalletBtn.textContent = "Connect Wallet";
-                    connectWalletBtn.classList.remove("wallet-connected");
-                    badgeDisplay.style.display = "none";
-                    donationForm.style.display = "none";
-                }
-            });
-        }
+        };
+        document.head.appendChild(script);
     </script>
-
-    <!-- Load Ethers.js from CDN -->
-    <script src="https://cdn.ethers.io/lib/ethers-5.2.umd.min.js"></script>
 </body>
 </html>
